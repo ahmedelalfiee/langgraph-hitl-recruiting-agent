@@ -1,0 +1,33 @@
+# Shared memory for one client business.
+# Every agent in the graph reads this, so the email agent, the calendar agent
+# and the approval step all work from the same facts.
+
+business_name: Talent Co. Recruiting
+sender_name: Sara Mendes          # who the emails are signed by
+owner_whatsapp: "whatsapp:+351000000000"   # the owner's WhatsApp number, in this exact format
+timezone: Europe/Lisbon
+
+tone: >
+  Warm, short and human. First names. No buzzwords, no em dashes.
+  60 to 110 words. Plain text, no markdown.
+
+open_roles:
+  - title: Senior Frontend Developer
+    notes: React and TypeScript, remote or Lisbon
+  - title: Backend Developer
+    notes: Python or Go, remote in Europe
+  - title: Product Designer
+    notes: Figma, B2B SaaS experience
+
+interview:
+  title: First interview
+  minutes: 30
+  format: video call (Google Meet link sent after the candidate confirms)
+  working_hours: [9, 17]     # local time, start and end hour
+  days_ahead: 7              # how far ahead to look for free slots
+  slots_to_offer: 2
+
+signature: |
+  Best,
+  Sara
+  Talent Co. Recruiting

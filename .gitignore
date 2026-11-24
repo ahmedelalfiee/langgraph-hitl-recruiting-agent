@@ -1,0 +1,10 @@
+.env
+credentials.json
+token.json
+*.db
+.venv/
+__pycache__/
+.pytest_cache/
+.env.*
+!.env.example
+*.sqlite
