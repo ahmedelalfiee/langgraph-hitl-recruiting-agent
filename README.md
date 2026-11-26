@@ -148,7 +148,7 @@ python -m evals.run --suite draft      # one suite
 | Suite | All checks pass | p50 latency | Cost per 1k tasks |
 |---|---|---|---|
 | triage | 100% (30/30) | 0.95 s | $0.39 |
-| confirm | 95% (19/20) | 0.87 s | $0.24 |
+| confirm | 100% (20/20) | 0.99 s | $0.26 |
 | draft | 100% (12/12) | 1.16 s | $0.60 |
 
 **What the first run caught.** Every unit test passed, because they use a fake model. The first
@@ -158,7 +158,7 @@ rounds and promised an interview); an application for a role that isn't open was
 skipped**; and when the model did call it an application, the agent **offered and held an
 interview slot for a job that doesn't exist**. The prompts now restrict replies to facts the
 business gave and say "I'll check" otherwise, slots are only offered for open roles, and the
-checks above keep it that way. Known gap: deterministic checks can't catch every invented fact
+checks above keep it that way. The confirm suite first scored 95%: "Tuesday works, but could we make it 16:00?" was read as "other"; after defining a different time on an offered day as a reschedule, it scores 100%. Known gap: deterministic checks can't catch every invented fact
 (one reply pointed to a "roles page" the business never mentioned), which is the case for adding
 an LLM judge for groundedness next.
 
