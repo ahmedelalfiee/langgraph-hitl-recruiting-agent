@@ -15,6 +15,8 @@ New email                    Reply in a conversation Opzy started
 
 Nothing reaches a candidate without the owner's OK. Side effects (WhatsApp, Gmail,
 Calendar) live in their own nodes, because an interrupted node re-runs on resume.
+Inside those nodes each side effect runs through `once`, so a node that fails halfway and
+is retried does not repeat the steps that already happened.
 """
 from __future__ import annotations
 
@@ -57,6 +59,20 @@ def build_graph(d: Deps, checkpointer):
 
     def run_id(s: State) -> str:
         return s["email"]["id"]
+
+    def once(s: State, step: str, fn):
+        """Run one side effect at most once per approval.
+
+        The key is the run, the approval code and the step. The result is recorded after the
+        call, and the same key goes to Gmail and Calendar, so even a crash between the call and
+        the record can't produce a second email or event (see google_tools)."""
+        key = f"{run_id(s)}:{s['code']}:{step}"
+        done = d.memory.action_result(key)
+        if done is not None:
+            return done["value"]
+        value = fn(key)
+        d.memory.record_action(key, {"value": value})
+        return value
 
     def who(s: State) -> str:
         return (s.get("triage") or {}).get("candidate_first_name") or s["email"]["from"]
@@ -157,45 +173,47 @@ def build_graph(d: Deps, checkpointer):
     # ---------------------------------------------------------------- actions
     def act(s: State):
         e = s["email"]
-        sent_id = d.gmail.send_reply(e, s["draft"])
+        sent_id = once(s, "send", lambda k: d.gmail.send_reply(e, s["draft"], key=k))
         event_id: Optional[str] = None
         if s.get("slots"):
             old = s.get("thread")
             if old and old.get("hold_event_id"):
                 d.calendar.delete(old["hold_event_id"])  # new slots replace the old hold
-            event_id = d.calendar.hold(
+            event_id = once(s, "hold", lambda k: d.calendar.hold(
                 s["slots"][0],
                 f"HOLD: {biz.interview['title']} · {who(s)} ({s['triage'].get('role')})",
                 f"Offered by Opzy, approved by owner. Candidate: {e['from']}",
-            )
+                key=k,
+            ))
             d.memory.save_thread(e["thread_id"], (s.get("thread") or {}).get("candidate_email") or e["from_email"],
                                  who(s), s["triage"].get("role"), s["slots"], event_id)
         d.memory.close_approval(s["code"], "approved")
         d.memory.log(run_id(s), "sent", {"gmail_id": sent_id, "event_id": event_id})
         done = "✅ Sent from your Gmail" + (", slot held in your calendar." if event_id else ".")
-        d.whatsapp.send(biz.owner_whatsapp, done)
+        once(s, "notify", lambda k: d.whatsapp.send(biz.owner_whatsapp, done))
         return {"result": {"status": "sent", "gmail_id": sent_id, "event_id": event_id}}
 
     def book(s: State):
         t, slot, e = s["thread"], s["slots"][0], s["email"]
         if t.get("hold_event_id"):
             d.calendar.delete(t["hold_event_id"])
-        event_id, meet = d.calendar.book(
+        event_id, meet = once(s, "book", lambda k: list(d.calendar.book(
             slot, f"{biz.interview['title']}: {t['candidate_name']} · {t['role']} ({biz.business_name})",
             t["candidate_email"], f"{biz.interview['minutes']}-minute interview. Booked by Opzy, approved by owner.",
-        )
+            key=k,
+        )))
         body = (
             f"Hi {t['candidate_name']},\n\nGreat, you're booked for {slot['label']} "
             f"({biz.interview['minutes']} minutes, {biz.timezone.split('/')[-1]} time).\n\n"
             + (f"Google Meet link: {meet}\n" if meet else "")
             + "You'll also get a calendar invite.\n\n" + biz.signature.strip()
         )
-        sent_id = d.gmail.send_reply(e, body)
+        sent_id = once(s, "send", lambda k: d.gmail.send_reply(e, body, key=k))
         d.memory.set_thread_status(t["thread_id"], "booked")
         d.memory.close_approval(s["code"], "approved")
         d.memory.log(run_id(s), "booked", {"event_id": event_id, "meet": meet})
-        d.whatsapp.send(biz.owner_whatsapp,
-                        f"📅 Booked: {t['candidate_name']}, {slot['label']}. Invite and Meet link sent.")
+        once(s, "notify", lambda k: d.whatsapp.send(
+            biz.owner_whatsapp, f"📅 Booked: {t['candidate_name']}, {slot['label']}. Invite and Meet link sent."))
         return {"result": {"status": "booked", "event_id": event_id, "meet": meet, "gmail_id": sent_id}}
 
     g = StateGraph(State)

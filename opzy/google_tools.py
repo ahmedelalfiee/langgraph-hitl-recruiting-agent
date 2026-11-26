@@ -26,6 +26,30 @@ def google_creds(credentials_file: str, token_file: str):
     return creds
 
 
+KEY_HEADER = "X-Opzy-Key"
+
+
+def event_id_for(key: str) -> str:
+    """A Calendar event id derived from an action key.
+
+    Calendar accepts client-chosen ids (base32hex: 0-9 and a-v, 5-1024 chars) and refuses a
+    second insert with the same id, so retrying an insert can't create a duplicate event."""
+    import hashlib
+
+    alphabet = "0123456789abcdefghijklmnopqrstuv"
+    n = int.from_bytes(hashlib.sha256(key.encode()).digest()[:20], "big")
+    out = ""
+    while n:
+        n, r = divmod(n, 32)
+        out = alphabet[r] + out
+    return "op" + out.rjust(32, "0")  # "op" prefix: y and z are not valid id characters
+
+
+def _is_conflict(err: Exception) -> bool:
+    status = getattr(getattr(err, "resp", None), "status", None)
+    return str(status) == "409"
+
+
 def _header(headers, name):
     for h in headers:
         if h["name"].lower() == name.lower():
@@ -86,7 +110,23 @@ class Gmail:
                     out.append(m)
         return out
 
-    def send_reply(self, email: dict, body: str) -> str:
+    def sent_with_key(self, thread_id: str, key: str) -> str | None:
+        """Id of a message we already sent in this thread with this action key, if any."""
+        th = self.svc.users().threads().get(
+            userId="me", id=thread_id, format="metadata", metadataHeaders=[KEY_HEADER]
+        ).execute()
+        for m in th.get("messages", []):
+            if _header(m.get("payload", {}).get("headers", []), KEY_HEADER) == key:
+                return m["id"]
+        return None
+
+    def send_reply(self, email: dict, body: str, key: str | None = None) -> str:
+        """Reply in the candidate's thread. With a key, a retry finds the earlier send instead of
+        sending again: the key travels in a header and is checked in the thread first."""
+        if key:
+            existing = self.sent_with_key(email["thread_id"], key)
+            if existing:
+                return existing
         subj = email["subject"] if email["subject"].lower().startswith("re:") else f"Re: {email['subject']}"
         msg = MIMEText(body)
         msg["To"] = email["from_email"]
@@ -95,6 +135,8 @@ class Gmail:
         if email.get("message_id_header"):
             msg["In-Reply-To"] = email["message_id_header"]
             msg["References"] = email["message_id_header"]
+        if key:
+            msg[KEY_HEADER] = key
         raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
         sent = self.svc.users().messages().send(
             userId="me", body={"raw": raw, "threadId": email["thread_id"]}
@@ -124,28 +166,40 @@ class Calendar:
                 for b in fb["calendars"][self.cal]["busy"]]
         return pick_slots(busy, start, days_ahead, tz, minutes, hours, count)
 
-    def hold(self, slot: dict, title: str, description: str) -> str:
-        ev = self.svc.events().insert(calendarId=self.cal, body={
+    def _insert_once(self, body: dict, key: str | None, **kwargs) -> dict:
+        """Insert an event; with a key, the id is fixed so a retry returns the existing event."""
+        if key:
+            body = {**body, "id": event_id_for(key)}
+        try:
+            return self.svc.events().insert(calendarId=self.cal, body=body, **kwargs).execute()
+        except Exception as err:
+            if key and _is_conflict(err):  # already created by an earlier attempt
+                return self.svc.events().get(calendarId=self.cal, eventId=body["id"]).execute()
+            raise
+
+    def hold(self, slot: dict, title: str, description: str, key: str | None = None) -> str:
+        ev = self._insert_once({
             "summary": title, "description": description,
             "start": {"dateTime": slot["start"]}, "end": {"dateTime": slot["end"]},
             "transparency": "opaque", "colorId": "9",
-        }).execute()
+        }, key)
         return ev["id"]
 
-    def book(self, slot: dict, title: str, attendee_email: str, description: str) -> tuple[str, str]:
-        """Real meeting: candidate invited, Google Meet link added, invite email sent by Google."""
+    def book(self, slot: dict, title: str, attendee_email: str, description: str,
+             key: str | None = None) -> tuple[str, str]:
+        """Real meeting: candidate invited, Google Meet link added, invite email sent by Google.
+
+        With a key, a retry can't send the candidate a second invite: the event id is fixed."""
         import uuid
 
-        ev = self.svc.events().insert(
-            calendarId=self.cal, conferenceDataVersion=1, sendUpdates="all",
-            body={
-                "summary": title, "description": description,
-                "start": {"dateTime": slot["start"]}, "end": {"dateTime": slot["end"]},
-                "attendees": [{"email": attendee_email}],
-                "conferenceData": {"createRequest": {"requestId": uuid.uuid4().hex,
-                                                     "conferenceSolutionKey": {"type": "hangoutsMeet"}}},
-            },
-        ).execute()
+        request_id = event_id_for(key) if key else uuid.uuid4().hex
+        ev = self._insert_once({
+            "summary": title, "description": description,
+            "start": {"dateTime": slot["start"]}, "end": {"dateTime": slot["end"]},
+            "attendees": [{"email": attendee_email}],
+            "conferenceData": {"createRequest": {"requestId": request_id,
+                                                 "conferenceSolutionKey": {"type": "hangoutsMeet"}}},
+        }, key, conferenceDataVersion=1, sendUpdates="all")
         return ev["id"], ev.get("hangoutLink", "")
 
     def delete(self, event_id: str) -> None:

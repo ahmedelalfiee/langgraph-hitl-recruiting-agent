@@ -62,35 +62,45 @@ the owner's `OK` the next morning still resumes the right run (`test_resume_surv
 **2. Side effects live in their own nodes.** When a run resumes, LangGraph re-executes the
 interrupted node from the top. If sending the email lived in the same node as the interrupt, the
 candidate would get it twice. So `wait_for_owner` does nothing but wait, and every irreversible
-action (`act`, `book`) runs in a node after it, exactly once.
+action (`act`, `book`) runs in a node after it.
 
-**3. Approval codes, not "the latest message".** Each pending decision gets a short code
+**3. Every side effect has an idempotency key.** A node can still fail halfway: the email goes
+out, then the calendar call times out. The approval stays pending, the owner gets a warning, and
+`OK <code>` retries the node. Each side effect inside it runs through `once()` with a key of
+*run + approval code + step*, so the retry skips what already happened. The result is stored after
+the call, which leaves a small gap (the process dies right after Gmail accepts the email), so the
+same key also goes to Google: it travels in an `X-Opzy-Key` header that is checked in the thread
+before sending, and becomes a fixed Calendar event id, which Calendar refuses to insert twice
+(so a candidate can never get two invites). An `EDIT` creates a new approval code, so an edited
+draft gets new keys and is really sent.
+
+**4. Approval codes, not "the latest message".** Each pending decision gets a short code
 (`OK A3F2`), so an owner with several drafts waiting can't approve the wrong one. A bare `OK`
 falls back to the most recent.
 
-**4. Conversations, not single emails.** After the agent replies, it stores the thread, the slots
+**5. Conversations, not single emails.** After the agent replies, it stores the thread, the slots
 it offered and the calendar hold. When the candidate answers, triage recognises the thread and an
 LLM classifies the answer as *confirm / reschedule / decline / other*. A confirmation goes to
 booking (deleting the hold first); a reschedule produces a fresh offer and replaces the old hold.
 
-**5. Fail loudly, retry safely.** An email is marked as processed before its run starts (so two
+**6. Fail loudly, retry safely.** An email is marked as processed before its run starts (so two
 polls can't race), but if the run fails before reaching the owner, the mark is removed and the next
 poll retries it. One bad email never blocks the others (`test_failed_email_is_retried`).
 
-**6. Least privilege at the edges.** Gmail reading is scoped by a query (e.g. one alias), and
+**7. Least privilege at the edges.** Gmail reading is scoped by a query (e.g. one alias), and
 the WhatsApp webhook ignores anyone but the owner's number and verifies Twilio's request
 signature when a public URL is configured.
 
-**7. Model-agnostic.** The two LLM jobs sit behind a small interface with OpenAI and Anthropic
+**8. Model-agnostic.** The two LLM jobs sit behind a small interface with OpenAI and Anthropic
 implementations, picked from whichever key is configured.
 
 ## Tests
 
-21 tests run end to end against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
+25 tests run end to end against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -q        # 21 passed
+python -m pytest -q        # 25 passed
 ```
 
 They cover the guarantees that matter:
@@ -104,6 +114,9 @@ They cover the guarantees that matter:
 | The same email is handled once | `test_same_email_only_once` |
 | A pending approval survives a restart | `test_resume_survives_restart` |
 | A failed email is retried, not lost | `test_failed_email_is_retried` |
+| Retrying a half-finished action doesn't email the candidate twice | `test_retry_after_crash_does_not_resend_email` |
+| Even a crash right after Gmail accepts the email can't cause a resend | `test_crash_before_the_send_is_recorded_does_not_resend` |
+| Retrying a booking sends one invite | `test_booking_retry_sends_one_invite` |
 | Candidate confirms, owner approves, interview booked | `test_candidate_confirms_then_owner_books` |
 | Candidate asks for another time, gets a new offer | `test_candidate_asks_other_time_gets_new_offer` |
 | Slots skip busy times and weekends | `test_pick_slots_skips_busy_and_weekends` |

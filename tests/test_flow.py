@@ -38,7 +38,7 @@ class FakeGmail:
     me = "talentco@example.com"
 
     def __init__(self, msgs=None):
-        self.msgs, self.sent, self.replies = msgs or [], [], []
+        self.msgs, self.sent, self.replies, self.by_key = msgs or [], [], [], {}
 
     def new_messages(self):
         return self.msgs
@@ -46,14 +46,19 @@ class FakeGmail:
     def thread_replies(self, thread_ids):
         return [m for m in self.replies if m["thread_id"] in thread_ids]
 
-    def send_reply(self, email, body):
+    def send_reply(self, email, body, key=None):
+        if key in self.by_key:  # like the real client: the key header is found in the thread
+            return self.by_key[key]
         self.sent.append((email["from_email"], body))
-        return "sent-1"
+        msg_id = f"sent-{len(self.sent)}"
+        if key:
+            self.by_key[key] = msg_id
+        return msg_id
 
 
 class FakeCalendar:
     def __init__(self):
-        self.holds = []
+        self.holds, self.bookings, self.by_key = [], [], {}
 
     def free_slots(self, tz, minutes, hours, days_ahead, count):
         return [{"start": "2026-11-24T15:00:00+00:00", "end": "2026-11-24T15:30:00+00:00",
@@ -61,13 +66,20 @@ class FakeCalendar:
                 {"start": "2026-11-25T11:00:00+00:00", "end": "2026-11-25T11:30:00+00:00",
                  "label": "Wednesday 25 November at 11:00"}][:count]
 
-    def hold(self, slot, title, description):
+    def hold(self, slot, title, description, key=None):
+        if key in self.by_key:  # like the real client: a fixed event id can't be inserted twice
+            return self.by_key[key]
         self.holds.append((slot["label"], title))
-        return f"hold-{len(self.holds)}"
+        self.by_key[key] = f"hold-{len(self.holds)}"
+        return self.by_key[key]
 
-    def book(self, slot, title, attendee, description):
+    def book(self, slot, title, attendee, description, key=None):
+        if key in self.by_key:
+            return self.by_key[key]
         self.booked = (slot["label"], attendee)
-        return "evt-booked", "https://meet.google.com/abc-defg-hij"
+        self.bookings.append(self.booked)
+        self.by_key[key] = ("evt-booked", "https://meet.google.com/abc-defg-hij")
+        return self.by_key[key]
 
     def delete(self, event_id):
         self.deleted = getattr(self, "deleted", []) + [event_id]
@@ -240,3 +252,65 @@ def test_strip_quoted_reply():
     t = "Yes, Tuesday works!\n\nMichael\n\nOn Mon, 23 Nov 2026 at 13:30, Talent Co. <\ntalentco@example.com> wrote:\n> Hi Michael,\n> old text"
     assert _strip_quoted(t) == "Yes, Tuesday works!\n\nMichael"
     assert _strip_quoted("Just a plain email") == "Just a plain email"
+
+
+# ---- retries: an approved action that fails halfway can be retried without repeating itself
+
+def fail_once(obj, name):
+    """Make obj.name raise on its first call only (a timeout, a crash)."""
+    real, calls = getattr(obj, name), []
+
+    def wrapper(*a, **k):
+        calls.append(1)
+        if len(calls) == 1:
+            raise RuntimeError(f"{name} failed")
+        return real(*a, **k)
+
+    setattr(obj, name, wrapper)
+
+
+def test_retry_after_crash_does_not_resend_email(tmp_path):
+    eng, d = make(tmp_path)
+    eng.handle_email(EMAIL)
+    code = code_from(d.whatsapp.out[0])
+    fail_once(d.calendar, "hold")  # the email goes out, then the calendar call fails
+    reply = eng.handle_owner_reply(f"OK {code}")
+    assert reply.startswith("⚠️") and code in reply
+    assert len(d.gmail.sent) == 1 and d.memory.pending_count() == 1
+    eng.handle_owner_reply(f"OK {code}")  # the owner retries
+    assert len(d.gmail.sent) == 1, "the candidate must not get the email twice"
+    assert len(d.calendar.holds) == 1
+    assert d.whatsapp.out[-1].startswith("✅ Sent") and d.memory.pending_count() == 0
+
+
+def test_crash_before_the_send_is_recorded_does_not_resend(tmp_path):
+    eng, d = make(tmp_path)
+    eng.handle_email(EMAIL)
+    code = code_from(d.whatsapp.out[0])
+    fail_once(d.memory, "record_action")  # Gmail accepted the email, then the process died
+    eng.handle_owner_reply(f"OK {code}")
+    eng.handle_owner_reply(f"OK {code}")
+    assert len(d.gmail.sent) == 1, "the key sent to Gmail must stop the second send"
+
+
+def test_booking_retry_sends_one_invite(tmp_path):
+    eng, d = make(tmp_path)
+    eng.handle_email(EMAIL)
+    eng.handle_owner_reply(f"OK {code_from(d.whatsapp.out[0])}")
+    d.gmail.replies = [{"id": "m2", "thread_id": "t1", "from": "Omar", "from_email": "omar@example.com",
+                        "subject": "Re: Application", "message_id_header": "<z@y>", "body": "Tuesday works!"}]
+    eng.poll()
+    code = code_from(d.whatsapp.out[-1])
+    fail_once(d.gmail, "send_reply")  # the invite is created, then the confirmation email fails
+    assert eng.handle_owner_reply(f"OK {code}").startswith("⚠️")
+    eng.handle_owner_reply(f"OK {code}")
+    assert len(d.calendar.bookings) == 1, "the candidate must get one invite"
+    assert d.whatsapp.out[-1].startswith("📅 Booked")
+
+
+def test_calendar_event_ids_are_valid_and_stable():
+    from opzy.google_tools import event_id_for
+
+    a = event_id_for("m1:A3F2:hold")
+    assert a == event_id_for("m1:A3F2:hold") and a != event_id_for("m1:A3F2:book")
+    assert 5 <= len(a) <= 1024 and set(a) <= set("0123456789abcdefghijklmnopqrstuv")

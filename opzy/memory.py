@@ -25,6 +25,7 @@ class Memory:
             CREATE TABLE IF NOT EXISTS threads (
                 thread_id TEXT PRIMARY KEY, candidate_email TEXT, candidate_name TEXT, role TEXT,
                 slots TEXT, hold_event_id TEXT, status TEXT, at REAL);
+            CREATE TABLE IF NOT EXISTS actions (key TEXT PRIMARY KEY, result TEXT, at REAL);
             """
         )
 
@@ -96,6 +97,18 @@ class Memory:
     def set_thread_status(self, thread_id: str, status: str) -> None:
         with self._lock:
             self.db.execute("UPDATE threads SET status=? WHERE thread_id=?", (status, thread_id))
+            self.db.commit()
+
+    # ---- side effects that already happened (see graph.once)
+    def action_result(self, key: str):
+        """The stored result of a completed side effect, or None if it never completed."""
+        with self._lock:
+            row = self.db.execute("SELECT result FROM actions WHERE key=?", (key,)).fetchone()
+        return None if row is None else json.loads(row[0])
+
+    def record_action(self, key: str, result) -> None:
+        with self._lock:
+            self.db.execute("INSERT OR REPLACE INTO actions VALUES (?,?,?)", (key, json.dumps(result), time.time()))
             self.db.commit()
 
     # ---- log

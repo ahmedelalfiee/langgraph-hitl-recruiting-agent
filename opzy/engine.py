@@ -64,6 +64,13 @@ class Engine:
             return "Nothing is waiting for your OK right now 👌"
         code, run_id, who = row
         decision = {"action": r["action"], "note": r.get("note", "")}
-        self.graph.invoke(Command(resume=decision), self._cfg(run_id))
+        try:
+            self.graph.invoke(Command(resume=decision), self._cfg(run_id))
+        except Exception as err:
+            # The approval stays pending, so the owner can retry with the same code. Steps that
+            # already happened (e.g. the email) are recorded and will not run a second time.
+            log.error("action for %s failed: %s", code, err)
+            return (f"⚠️ Something failed while finishing {code} ({type(err).__name__}). "
+                    f"Reply *OK {code}* to retry. Anything already done won't be repeated.")
         # act / rejected / redraft send their own WhatsApp messages
         return ""
