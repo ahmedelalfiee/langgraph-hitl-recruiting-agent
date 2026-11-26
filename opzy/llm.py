@@ -80,6 +80,16 @@ def _json(text: str) -> dict:
 class PromptLLM:
     """Shared prompts; subclasses only implement _ask()."""
 
+    model = ""
+    usage = None  # {"calls", "input_tokens", "output_tokens"}, filled in by _ask (used by evals)
+
+    def _count(self, input_tokens, output_tokens) -> None:
+        if self.usage is None:
+            self.usage = {"calls": 0, "input_tokens": 0, "output_tokens": 0}
+        self.usage["calls"] += 1
+        self.usage["input_tokens"] += int(input_tokens or 0)
+        self.usage["output_tokens"] += int(output_tokens or 0)
+
     def _ask(self, prompt: str, max_tokens: int = 600) -> str:  # pragma: no cover
         raise NotImplementedError
 
@@ -125,6 +135,8 @@ class AnthropicLLM(PromptLLM):
         r = self.client.messages.create(
             model=self.model, max_tokens=max_tokens, messages=[{"role": "user", "content": prompt}]
         )
+        u = getattr(r, "usage", None)
+        self._count(getattr(u, "input_tokens", 0), getattr(u, "output_tokens", 0))
         return "".join(b.text for b in r.content if getattr(b, "type", "") == "text").strip()
 
 
@@ -141,6 +153,8 @@ class OpenAILLM(PromptLLM):
             messages=[{"role": "user", "content": prompt}],
             max_completion_tokens=max_tokens * 4,  # reasoning models spend some tokens thinking
         )
+        u = getattr(r, "usage", None)
+        self._count(getattr(u, "prompt_tokens", 0), getattr(u, "completion_tokens", 0))
         return (r.choices[0].message.content or "").strip()
 
 

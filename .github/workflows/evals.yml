@@ -1,0 +1,33 @@
+name: evals
+# Runs the agent's prompts against the golden sets whenever a prompt, the business
+# profile or the evals change, and fails if quality drops below evals/thresholds.json.
+# Needs an OPENAI_API_KEY repository secret; without it the job is skipped.
+on:
+  pull_request:
+    paths: ["opzy/llm.py", "business.yaml", "evals/**"]
+  workflow_dispatch:
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_MODEL: gpt-5.4-mini
+      LLM_PROVIDER: openai
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Run evals
+        if: env.OPENAI_API_KEY != ''
+        run: python -m evals.run
+      - name: No API key configured
+        if: env.OPENAI_API_KEY == ''
+        run: echo "OPENAI_API_KEY secret not set; skipping live evals."
+      - uses: actions/upload-artifact@v4
+        if: always() && env.OPENAI_API_KEY != ''
+        with:
+          name: eval-results
+          path: evals/results/

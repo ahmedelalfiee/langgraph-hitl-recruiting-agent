@@ -1,0 +1,6 @@
+{
+  "_comment": "Minimum % of cases where every check passes. Set from the first baseline run, then only raise.",
+  "triage": 0,
+  "confirm": 0,
+  "draft": 0
+}

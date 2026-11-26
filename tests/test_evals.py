@@ -1,0 +1,92 @@
+"""The eval scorers are code too, so they get tests: a bug here would hide real failures."""
+from evals.run import load, run_suite
+from evals.score import _times, score_confirm, score_draft, score_triage
+from opzy.config import load_business
+
+BIZ = load_business()
+SIG = BIZ.signature
+SLOTS = [{"label": "Tuesday 24 November at 15:00"}, {"label": "Wednesday 25 November at 11:00"}]
+OFFER = {"slots": SLOTS, "expect": "offer"}
+
+GOOD = ("Hi Omar,\n\nThanks for applying for the Senior Frontend Developer role. Your React and "
+        "TypeScript background sounds like a great fit. Could you do a 30-minute video call on Tuesday "
+        "24 November at 15:00? If that doesn't suit, Wednesday 25 November at 11:00 works too. Once you "
+        "confirm, I'll send a Google Meet link and a calendar invite. Looking forward to talking, and "
+        "let me know if you have any questions before then.\n\n" + SIG.strip())
+
+
+def test_times_are_read_in_common_formats():
+    assert _times("at 15:00, or 3pm, or 11.30, or 9 a.m.") == {900, 690, 540}
+
+
+def test_good_draft_passes_every_check():
+    assert all(score_draft(OFFER, GOOD, SIG).values()), score_draft(OFFER, GOOD, SIG)
+
+
+def test_invented_time_is_caught():
+    bad = GOOD.replace("11:00", "16:30")
+    assert score_draft(OFFER, bad, SIG)["no_invented_times"] is False
+
+
+def test_invented_day_is_caught():
+    bad = GOOD.replace("Wednesday 25 November", "Thursday 26 November")
+    assert score_draft(OFFER, bad, SIG)["no_invented_days"] is False
+
+
+def test_question_reply_must_not_offer_a_slot():
+    case = {"slots": [], "expect": "answer"}
+    text = "Hi Omar,\n\nIt's hybrid. Want to chat on Friday at 10:00?\n\n" + SIG.strip()
+    assert score_draft(case, text, SIG)["no_slot_offered"] is False
+
+
+def test_missing_signature_and_em_dash_are_caught():
+    c = score_draft(OFFER, GOOD.replace(SIG.strip(), "Cheers") + " — Sara", SIG)
+    assert c["ends_with_signature"] is False and c["no_em_dash"] is False
+
+
+def test_triage_scoring_ignores_accents_and_case():
+    case = {"kind": "application", "role": "Backend Developer", "name": "Inês"}
+    out = {"kind": "application", "role": "backend developer", "candidate_first_name": "Ines"}
+    assert all(score_triage(case, out).values())
+
+
+def test_confirm_checks_the_slot_only_for_a_confirmation():
+    case = {"decision": "confirm", "slot_index": 1}
+    assert score_confirm(case, {"decision": "confirm", "slot_index": 0}) == {"decision": True, "slot": False}
+    assert score_confirm({"decision": "reschedule"}, {"decision": "reschedule"}) == {"decision": True}
+
+
+class Oracle:
+    """Answers with the labels, so a correct pipeline must score 100%."""
+
+    usage = None
+    model = "oracle"
+
+    def __init__(self):
+        self.t = {c["email"]["subject"] + c["email"]["body"]: c for c in load("triage", None)}
+        self.c = {c["body"]: c for c in load("confirm", None)}
+
+    def triage(self, email, biz):
+        c = self.t[email["subject"] + email["body"]]
+        kind = c["kind"] or c["kind_any"][0]
+        role = c["role_any"][0] if "role_any" in c else c["role"]
+        return {"kind": kind, "role": role, "candidate_first_name": c.get("name"), "summary": ""}
+
+    def confirm(self, email, slots, biz):
+        c = self.c[email["body"]]
+        return {"decision": c["decision"], "slot_index": c["slot_index"]}
+
+
+def test_pipeline_scores_a_perfect_model_at_100():
+    for suite in ("triage", "confirm"):
+        s = run_suite(suite, Oracle(), BIZ)["summary"]
+        assert s["all_checks_pass_pct"] == 100.0, (suite, s["failures"])
+
+
+def test_a_crashing_model_fails_cases_instead_of_crashing_the_run():
+    class Broken(Oracle):
+        def confirm(self, *a):
+            raise ValueError("no JSON in model output")
+
+    s = run_suite("confirm", Broken(), BIZ, limit=3)["summary"]
+    assert s["all_checks_pass_pct"] == 0.0 and len(s["failures"]) == 3

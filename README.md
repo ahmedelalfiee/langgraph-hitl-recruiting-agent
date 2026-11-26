@@ -96,11 +96,11 @@ implementations, picked from whichever key is configured.
 
 ## Tests
 
-25 tests run end to end against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
+35 tests (the end-to-end flows plus the eval scorers) run against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -q        # 25 passed
+python -m pytest -q        # 35 passed
 ```
 
 They cover the guarantees that matter:
@@ -121,6 +121,31 @@ They cover the guarantees that matter:
 | Candidate asks for another time, gets a new offer | `test_candidate_asks_other_time_gets_new_offer` |
 | Slots skip busy times and weekends | `test_pick_slots_skips_busy_and_weekends` |
 | The webhook ignores anyone but the owner | `test_webhook` |
+
+## Evals
+
+The unit tests prove the plumbing. The evals measure the part that can't be unit-tested: the
+model's judgement. `evals/cases/` holds 62 labelled cases for the three LLM jobs:
+
+| Suite | Cases | What is checked |
+|---|---|---|
+| `triage` | 30 | kind (application, question, spam, other), role matched to an open role, candidate's first name. Includes roles that aren't open, a Portuguese email, a job-board relay, a referral and a withdrawal |
+| `confirm` | 20 | confirm / reschedule / decline / other, and *which* slot was accepted. Includes "Tuesday works, but 16:00?", "Either works" and a Portuguese reply |
+| `draft` | 12 | offers the first free slot, **never mentions a time or day that wasn't offered**, no slot offered to a question or a closed role, Meet link mentioned, signature exact, 60 to 110 words, no em dashes or markdown |
+
+Drafts are scored with deterministic checks rather than an LLM judge, so a failure points at a
+specific rule. The scorers have their own tests (`tests/test_evals.py`), including a check that a
+model answering with the labels scores 100%.
+
+```bash
+python -m evals.run                    # all suites, model from .env
+python -m evals.run --suite draft      # one suite
+```
+
+It prints the pass rate per check, latency and cost per 1,000 tasks, writes
+`evals/results/<model>.json`, and exits non-zero if a suite falls below `evals/thresholds.json`.
+The `evals` workflow runs it on every pull request that touches a prompt, the business profile or
+the evals (it needs an `OPENAI_API_KEY` repository secret).
 
 ## Run it
 
