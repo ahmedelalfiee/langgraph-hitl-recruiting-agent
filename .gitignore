@@ -8,3 +8,6 @@ __pycache__/
 .env.*
 !.env.example
 *.sqlite
+
+# local eval runs (the committed baseline lives in evals/baseline/)
+evals/results/

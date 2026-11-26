@@ -143,7 +143,7 @@ python -m evals.run                    # all suites, model from .env
 python -m evals.run --suite draft      # one suite
 ```
 
-**Baseline** (gpt-5.4-mini, `evals/results/gpt-5.4-mini.json`):
+**Baseline** (gpt-5.4-mini, `evals/baseline/gpt-5.4-mini.json`):
 
 | Suite | All checks pass | p50 latency | Cost per 1k tasks |
 |---|---|---|---|
