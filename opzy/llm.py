@@ -25,6 +25,9 @@ Body:
 \"\"\"{body}\"\"\"
 
 Reply with JSON only, no other text:
+"application" means someone applying for a job, even one that is not in the open roles (then role is null).
+"candidate_question" means a candidate asking about a role or their application without applying.
+
 {{"kind": "application" | "candidate_question" | "other" | "spam",
   "role": "<exact title from the open roles, or null>",
   "candidate_first_name": "<the candidate's first name as they sign the email; only use the From name if the email isn't signed>",
@@ -49,7 +52,12 @@ What the inbox agent found: {summary} (kind: {kind}, role: {role})
 Write only the reply body. If this is an application for an open role, thank them briefly,
 offer the first slot and mention the second as a backup, and say a Google Meet link follows
 once they confirm. If the role is not open, say so kindly and keep the door open.
-If it is a question, answer it simply. End with exactly this signature:
+If it is a question, answer it simply.
+Only state facts given above (roles and their notes, the interview format, the free slots).
+If they ask about anything else, such as salary, visa or relocation, the number of rounds, tasks,
+or where their application stands, say you'll check and get back to them. Never invent numbers,
+policies or promises: this email is sent in the business's name.
+End with exactly this signature:
 {signature}"""
 
 

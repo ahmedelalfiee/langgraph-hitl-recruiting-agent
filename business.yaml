@@ -9,7 +9,7 @@ timezone: Europe/Lisbon
 
 tone: >
   Warm, short and human. First names. No buzzwords, no em dashes.
-  60 to 110 words. Plain text, no markdown.
+  At most 110 words. Plain text, no markdown.
 
 open_roles:
   - title: Senior Frontend Developer

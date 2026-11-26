@@ -96,11 +96,11 @@ implementations, picked from whichever key is configured.
 
 ## Tests
 
-37 tests (the end-to-end flows plus the eval scorers) run against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
+39 tests (the end-to-end flows plus the eval scorers) run against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -q        # 37 passed
+python -m pytest -q        # 39 passed
 ```
 
 They cover the guarantees that matter:
@@ -132,7 +132,7 @@ model's judgement. `evals/cases/` holds 62 labelled cases for the three LLM jobs
 |---|---|---|
 | `triage` | 30 | kind (application, question, spam, other), role matched to an open role, candidate's first name. Includes roles that aren't open, a Portuguese email, a job-board relay, a referral and a withdrawal |
 | `confirm` | 20 | confirm / reschedule / decline / other, and *which* slot was accepted. Includes "Tuesday works, but 16:00?", "Either works" and a Portuguese reply |
-| `draft` | 12 | offers the first free slot, **never mentions a time or day that wasn't offered**, no slot offered to a question or a closed role, Meet link mentioned, signature exact, 60 to 110 words, no em dashes or markdown |
+| `draft` | 12 | offers the first free slot, **never mentions a time or day that wasn't offered**, **never states a salary or other fact the business didn't give it, and says it will check instead**, no slot offered to a question or a closed role, Meet link mentioned, signature exact, at most 110 words, no em dashes or markdown |
 
 Drafts are scored with deterministic checks rather than an LLM judge, so a failure points at a
 specific rule. The scorers have their own tests (`tests/test_evals.py`), including a check that a

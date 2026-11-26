@@ -93,7 +93,7 @@ def main(argv=None) -> int:
         results[name] = res
     out_dir = HERE / "results"
     out_dir.mkdir(exist_ok=True)
-    (out_dir / f"{model or 'model'}.json").write_text(json.dumps(results, indent=2, ensure_ascii=False))
+    (out_dir / f"{model or 'model'}.json").write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
     return 0 if ok else 1
 
 

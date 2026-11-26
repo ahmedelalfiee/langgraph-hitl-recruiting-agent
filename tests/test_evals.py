@@ -111,3 +111,20 @@ def test_every_case_goes_through_the_real_prompt_code():
         rows = run_suite(suite, Canned(), BIZ)["rows"]
         crashed = [r["id"] for r in rows if r["checks"].get("ran") is False]
         assert not crashed, (suite, crashed[:3], rows[0]["output"])
+
+
+def test_invented_salary_is_caught():
+    """From the first real run: the model told a candidate a salary range that exists nowhere."""
+    case = {"slots": [], "expect": "answer", "unknown": True}
+    text = ("Hi Inês,\n\nThe salary range is usually between €55,000 and €70,000 gross per year.\n\n"
+            + SIG.strip())
+    c = score_draft(case, text, SIG)
+    assert c["no_invented_money"] is False and c["defers_unknown"] is False
+
+
+def test_deferring_an_unknown_answer_passes():
+    case = {"slots": [], "expect": "answer", "unknown": True}
+    text = ("Hi Inês,\n\nThanks for asking. I don't have the salary details to hand, so I'll check "
+            "with the team and get back to you this week.\n\n" + SIG.strip())
+    c = score_draft(case, text, SIG)
+    assert c["no_invented_money"] and c["defers_unknown"]

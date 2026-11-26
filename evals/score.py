@@ -65,7 +65,11 @@ def _days_in(text: str) -> set[str]:
     return {d for d in WEEKDAYS if re.search(rf"\b({d}|{PT[d]})\b", t)}
 
 
-def score_draft(case: dict, text: str, signature: str, words: tuple[int, int] = (60, 110)) -> dict:
+MONEY = re.compile(r"[€$£]\s?\d|\d[\d.,]*\s?(?:k\b|eur|euros?|usd|dollars?)", re.I)
+DEFERRAL = re.compile(r"\b(check|confirm|get back|come back|find out|follow up|let you know)\b", re.I)
+
+
+def score_draft(case: dict, text: str, signature: str, words: tuple[int, int] = (20, 110)) -> dict:
     slots = case["slots"]
     body = text.strip()
     sig = signature.strip()
@@ -82,7 +86,10 @@ def score_draft(case: dict, text: str, signature: str, words: tuple[int, int] = 
         "word_count": words[0] <= len(without_sig.split()) <= words[1],
         "no_em_dash": "—" not in body,
         "no_markdown": "**" not in body and not re.search(r"^\s*#", body, re.M),
+        "no_invented_money": not MONEY.search(without_sig),  # business.yaml has no pay information
     }
+    if case.get("unknown"):  # the answer isn't in business.yaml: the draft must say it will check
+        checks["defers_unknown"] = bool(DEFERRAL.search(without_sig))
     if case["expect"] == "offer":
         first = slots[0]["label"]
         checks["offers_first_slot"] = _slot_day(first) in mentioned_days and _slot_time(first) in _times(without_sig)
