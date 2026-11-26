@@ -110,8 +110,10 @@ def build_graph(d: Deps, checkpointer):
 
     # ---------------------------------------------------------------- reply path
     def find_slots(s: State):
-        if s["triage"].get("kind") != "application":
-            return {"slots": []}
+        role = (s["triage"].get("role") or "").strip().lower()
+        open_roles = {r["title"].lower() for r in biz.open_roles}
+        if s["triage"].get("kind") != "application" or role not in open_roles:
+            return {"slots": []}  # questions and closed roles get an answer, not an interview
         iv = biz.interview
         slots = d.calendar.free_slots(
             biz.timezone, iv["minutes"], tuple(iv["working_hours"]), iv["days_ahead"], iv["slots_to_offer"]

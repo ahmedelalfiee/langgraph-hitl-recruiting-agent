@@ -314,3 +314,13 @@ def test_calendar_event_ids_are_valid_and_stable():
     a = event_id_for("m1:A3F2:hold")
     assert a == event_id_for("m1:A3F2:hold") and a != event_id_for("m1:A3F2:book")
     assert 5 <= len(a) <= 1024 and set(a) <= set("0123456789abcdefghijklmnopqrstuv")
+
+
+def test_application_for_a_closed_role_gets_no_slot(tmp_path):
+    eng, d = make(tmp_path)
+    d.llm.triage = lambda email, biz: {"kind": "application", "role": None,
+                                       "candidate_first_name": "David", "summary": "Data Scientist, not open"}
+    eng.handle_email(EMAIL)
+    assert "no slot" in d.whatsapp.out[0], "a closed role must not be offered an interview"
+    eng.handle_owner_reply(f"OK {code_from(d.whatsapp.out[0])}")
+    assert d.calendar.holds == [] and len(d.gmail.sent) == 1

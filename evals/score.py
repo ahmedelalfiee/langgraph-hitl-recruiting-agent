@@ -10,6 +10,9 @@ import re
 import unicodedata
 
 WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+# Drafts may answer in the candidate's language; the agent's clients are in Portugal.
+PT = {"monday": "segunda", "tuesday": "terca", "wednesday": "quarta", "thursday": "quinta",
+      "friday": "sexta", "saturday": "sabado", "sunday": "domingo"}
 
 
 def _norm(s) -> str:
@@ -20,10 +23,9 @@ def _norm(s) -> str:
 def score_triage(case: dict, out: dict) -> dict:
     kinds = case.get("kind_any") or [case["kind"]]
     roles = case["role_any"] if "role_any" in case else [case["role"]]
-    checks = {
-        "kind": out.get("kind") in kinds,
-        "role": _norm(out.get("role")) in {_norm(r) for r in roles},
-    }
+    checks = {"kind": out.get("kind") in kinds}
+    if set(kinds) & {"application", "candidate_question"}:  # the role only matters for candidates
+        checks["role"] = _norm(out.get("role")) in {_norm(r) for r in roles}
     if case.get("name"):
         checks["name"] = _norm(out.get("candidate_first_name")) == _norm(case["name"])
     return checks
@@ -57,15 +59,21 @@ def _slot_day(label: str) -> str:
     return label.split()[0].lower()
 
 
+def _days_in(text: str) -> set[str]:
+    """Weekdays mentioned, in English or Portuguese, returned in English."""
+    t = _norm(text)
+    return {d for d in WEEKDAYS if re.search(rf"\b({d}|{PT[d]})\b", t)}
+
+
 def score_draft(case: dict, text: str, signature: str, words: tuple[int, int] = (60, 110)) -> dict:
     slots = case["slots"]
     body = text.strip()
     sig = signature.strip()
     without_sig = body[: -len(sig)] if body.endswith(sig) else body
     low = body.lower()
+    mentioned_days = _days_in(body)
     offered_times = {_slot_time(s["label"]) for s in slots}
     offered_days = {_slot_day(s["label"]) for s in slots}
-    mentioned_days = {d for d in WEEKDAYS if re.search(rf"\b{d}\b", low)}
 
     checks = {
         "ends_with_signature": body.endswith(sig),
@@ -77,7 +85,7 @@ def score_draft(case: dict, text: str, signature: str, words: tuple[int, int] = 
     }
     if case["expect"] == "offer":
         first = slots[0]["label"]
-        checks["offers_first_slot"] = _slot_day(first) in low and _slot_time(first) in _times(without_sig)
+        checks["offers_first_slot"] = _slot_day(first) in mentioned_days and _slot_time(first) in _times(without_sig)
         checks["mentions_meet_link"] = "meet" in low
     if case["expect"] in ("not_open", "answer"):
         checks["no_slot_offered"] = not _times(without_sig) and not mentioned_days

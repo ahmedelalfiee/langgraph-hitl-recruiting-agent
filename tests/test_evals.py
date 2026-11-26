@@ -90,3 +90,24 @@ def test_a_crashing_model_fails_cases_instead_of_crashing_the_run():
 
     s = run_suite("confirm", Broken(), BIZ, limit=3)["summary"]
     assert s["all_checks_pass_pct"] == 0.0 and len(s["failures"]) == 3
+
+
+def test_every_case_goes_through_the_real_prompt_code():
+    """The Oracle skips prompt building, which once hid a crash: confirm cases stored slots
+    as plain strings, and the real prompt expected {"label": ...}. Only the API call is faked here."""
+    from opzy.llm import PromptLLM
+
+    class Canned(PromptLLM):
+        model = "canned"
+
+        def _ask(self, prompt, max_tokens=600):
+            if '"decision"' in prompt:
+                return '{"decision": "other", "slot_index": null, "summary": ""}'
+            if '"kind"' in prompt:
+                return '{"kind": "other", "role": null, "candidate_first_name": null, "summary": ""}'
+            return "Hi,\\n\\nThanks for your email.\\n\\n" + SIG.strip()
+
+    for suite in ("triage", "confirm", "draft"):
+        rows = run_suite(suite, Canned(), BIZ)["rows"]
+        crashed = [r["id"] for r in rows if r["checks"].get("ran") is False]
+        assert not crashed, (suite, crashed[:3], rows[0]["output"])

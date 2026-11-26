@@ -96,11 +96,11 @@ implementations, picked from whichever key is configured.
 
 ## Tests
 
-35 tests (the end-to-end flows plus the eval scorers) run against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
+37 tests (the end-to-end flows plus the eval scorers) run against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -q        # 35 passed
+python -m pytest -q        # 37 passed
 ```
 
 They cover the guarantees that matter:
@@ -120,6 +120,7 @@ They cover the guarantees that matter:
 | Candidate confirms, owner approves, interview booked | `test_candidate_confirms_then_owner_books` |
 | Candidate asks for another time, gets a new offer | `test_candidate_asks_other_time_gets_new_offer` |
 | Slots skip busy times and weekends | `test_pick_slots_skips_busy_and_weekends` |
+| An application for a role that isn't open gets no interview slot | `test_application_for_a_closed_role_gets_no_slot` |
 | The webhook ignores anyone but the owner | `test_webhook` |
 
 ## Evals
