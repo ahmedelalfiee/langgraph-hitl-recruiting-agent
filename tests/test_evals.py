@@ -101,8 +101,8 @@ def test_every_case_goes_through_the_real_prompt_code():
         model = "canned"
 
         def _ask(self, prompt, max_tokens=600):
-            if '"unsupported"' in prompt:
-                return '{"unsupported": []}'
+            if '"claims"' in prompt:
+                return '{"claims": []}'
             if '"decision"' in prompt:
                 return '{"decision": "other", "slot_index": null, "summary": ""}'
             if '"kind"' in prompt:
@@ -142,13 +142,38 @@ def test_judge_sees_the_facts_and_flags_claims():
     class Judge:
         def _ask(self, prompt, max_tokens=600):
             seen["prompt"] = prompt
-            return '{"unsupported": ["salary range of EUR 55-70k"]}'
+            return ('{"claims": [{"claim": "the range is €55k to €70k", "support": "NONE"},'
+                    ' {"claim": "Backend Developer role", "support": "Backend Developer"}]}')
 
     case = load("draft", None)[8]  # d09, the salary question
     v = judge_draft(Judge(), BIZ, case, "Hi Inês, the range is €55k to €70k." + SIG)
-    assert v == {"grounded": False, "unsupported": ["salary range of EUR 55-70k"]}
+    assert v["grounded"] is False and v["unsupported"] == ["the range is €55k to €70k"]
     p = seen["prompt"]
     assert "Backend Developer" in p and "salary range" in p.lower() and "€55k" in p
+
+
+def test_judge_cannot_invent_its_own_evidence():
+    """A quote that isn't really in the sources doesn't count as support."""
+    from evals.judge import judge_draft
+
+    class Liar:
+        def _ask(self, prompt, max_tokens=600):
+            return '{"claims": [{"claim": "full relocation support", "support": "relocation support offered"}]}'
+
+    case = load("draft", None)[0]
+    assert judge_draft(Liar(), BIZ, case, "x")["grounded"] is False
+
+
+def test_real_quotes_count_as_support_despite_quotes_and_spacing():
+    from evals.judge import judge_draft
+
+    class Honest:
+        def _ask(self, prompt, max_tokens=600):
+            return ('{"claims": [{"claim": "Tuesday at 15:00", "support": "Tuesday 24 November at 15:00"},'
+                    ' {"claim": "Meet link after", "support": "Google Meet link sent  after the candidate confirms."}]}')
+
+    case = load("draft", None)[0]
+    assert judge_draft(Honest(), BIZ, case, "x")["grounded"] is True
 
 
 def test_judge_suite_scores_a_judge_that_matches_the_labels_at_100():
@@ -157,7 +182,7 @@ def test_judge_suite_scores_a_judge_that_matches_the_labels_at_100():
     class LabelJudge:
         def _ask(self, prompt, max_tokens=600):
             text = next(t for t in labels if t in prompt)
-            return '{"unsupported": []}' if labels[text] else '{"unsupported": ["x"]}'
+            return '{"claims": []}' if labels[text] else '{"claims": [{"claim": "x", "support": "NONE"}]}'
 
     s = run_suite("judge", None, BIZ, judge=LabelJudge())["summary"]
     assert s["all_checks_pass_pct"] == 100.0 and s["cases"] == 16

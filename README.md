@@ -96,11 +96,11 @@ implementations, picked from whichever key is configured.
 
 ## Tests
 
-42 tests (the end-to-end flows plus the eval scorers) run against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
+44 tests (the end-to-end flows plus the eval scorers) run against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -q        # 42 passed
+python -m pytest -q        # 44 passed
 ```
 
 They cover the guarantees that matter:
@@ -139,7 +139,10 @@ model's judgement. `evals/cases/` holds labelled cases for the three LLM jobs, p
 Drafts are scored by deterministic checks, so most failures point at a specific rule, plus an
 **LLM groundedness judge** (`evals/judge.py`) for what rules can't see: a claim the business never
 gave the agent, such as a policy, a team detail or a web page. The judge gets exactly what the
-drafting model got and lists every unsupported claim. Because a judge can be wrong too, it is only
+drafting model got and, for every factual claim, must quote the words in the sources that back
+it; the quotes are checked in code, so it can't invent its own evidence. (A first version that
+just listed "unsupported claims" caught all 8 invented facts but also flagged 7 of 8 honest
+drafts, including the offered slots.) Because a judge can be wrong too, it is only
 trusted as far as the `judge` suite shows (`--no-judge` scores drafts by rules alone). The scorers have their own tests (`tests/test_evals.py`), including a check that a
 model answering with the labels scores 100%.
 
