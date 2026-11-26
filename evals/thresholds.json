@@ -1,6 +1,7 @@
 {
-  "_comment": "Minimum % of cases where every check passes. Set just under the 26 Nov 2026 baseline (gpt-5.4-mini: triage 100, confirm 95, draft 100) so one flaky case doesn't block a PR, but a real regression does. Only raise these.",
+  "_comment": "Minimum % of cases where every check passes. Set just under the 26 Nov 2026 baseline (gpt-5.4-mini: triage 100, confirm 95, draft 100) so one flaky case doesn't block a PR, but a real regression does. Only raise these. The judge floor stays 0 until its first run on evals/cases/judge.jsonl.",
   "triage": 93,
   "confirm": 90,
-  "draft": 91
+  "draft": 91,
+  "judge": 0
 }

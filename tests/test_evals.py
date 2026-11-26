@@ -101,14 +101,16 @@ def test_every_case_goes_through_the_real_prompt_code():
         model = "canned"
 
         def _ask(self, prompt, max_tokens=600):
+            if '"unsupported"' in prompt:
+                return '{"unsupported": []}'
             if '"decision"' in prompt:
                 return '{"decision": "other", "slot_index": null, "summary": ""}'
             if '"kind"' in prompt:
                 return '{"kind": "other", "role": null, "candidate_first_name": null, "summary": ""}'
             return "Hi,\\n\\nThanks for your email.\\n\\n" + SIG.strip()
 
-    for suite in ("triage", "confirm", "draft"):
-        rows = run_suite(suite, Canned(), BIZ)["rows"]
+    for suite in ("triage", "confirm", "draft", "judge"):
+        rows = run_suite(suite, Canned(), BIZ, judge=Canned())["rows"]
         crashed = [r["id"] for r in rows if r["checks"].get("ran") is False]
         assert not crashed, (suite, crashed[:3], rows[0]["output"])
 
@@ -128,3 +130,41 @@ def test_deferring_an_unknown_answer_passes():
             "with the team and get back to you this week.\n\n" + SIG.strip())
     c = score_draft(case, text, SIG)
     assert c["no_invented_money"] and c["defers_unknown"]
+
+
+# ---- the groundedness judge
+
+def test_judge_sees_the_facts_and_flags_claims():
+    from evals.judge import judge_draft
+
+    seen = {}
+
+    class Judge:
+        def _ask(self, prompt, max_tokens=600):
+            seen["prompt"] = prompt
+            return '{"unsupported": ["salary range of EUR 55-70k"]}'
+
+    case = load("draft", None)[8]  # d09, the salary question
+    v = judge_draft(Judge(), BIZ, case, "Hi Inês, the range is €55k to €70k." + SIG)
+    assert v == {"grounded": False, "unsupported": ["salary range of EUR 55-70k"]}
+    p = seen["prompt"]
+    assert "Backend Developer" in p and "salary range" in p.lower() and "€55k" in p
+
+
+def test_judge_suite_scores_a_judge_that_matches_the_labels_at_100():
+    labels = {c["text"]: c["grounded"] for c in load("judge", None)}
+
+    class LabelJudge:
+        def _ask(self, prompt, max_tokens=600):
+            text = next(t for t in labels if t in prompt)
+            return '{"unsupported": []}' if labels[text] else '{"unsupported": ["x"]}'
+
+    s = run_suite("judge", None, BIZ, judge=LabelJudge())["summary"]
+    assert s["all_checks_pass_pct"] == 100.0 and s["cases"] == 16
+
+
+def test_judge_set_has_both_kinds_of_example():
+    rows = load("judge", None)
+    drafts = {c["id"] for c in load("draft", None)}
+    assert {r["grounded"] for r in rows} == {True, False}
+    assert all(r["draft"] in drafts for r in rows)

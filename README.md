@@ -96,11 +96,11 @@ implementations, picked from whichever key is configured.
 
 ## Tests
 
-39 tests (the end-to-end flows plus the eval scorers) run against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
+42 tests (the end-to-end flows plus the eval scorers) run against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -q        # 39 passed
+python -m pytest -q        # 42 passed
 ```
 
 They cover the guarantees that matter:
@@ -126,7 +126,7 @@ They cover the guarantees that matter:
 ## Evals
 
 The unit tests prove the plumbing. The evals measure the part that can't be unit-tested: the
-model's judgement. `evals/cases/` holds 62 labelled cases for the three LLM jobs:
+model's judgement. `evals/cases/` holds labelled cases for the three LLM jobs, plus a set that tests the judge:
 
 | Suite | Cases | What is checked |
 |---|---|---|
@@ -134,8 +134,13 @@ model's judgement. `evals/cases/` holds 62 labelled cases for the three LLM jobs
 | `confirm` | 20 | confirm / reschedule / decline / other, and *which* slot was accepted. Includes "Tuesday works, but 16:00?", "Either works" and a Portuguese reply |
 | `draft` | 12 | offers the first free slot, **never mentions a time or day that wasn't offered**, **never states a salary or other fact the business didn't give it, and says it will check instead**, no slot offered to a question or a closed role, Meet link mentioned, signature exact, at most 110 words, no em dashes or markdown |
 
-Drafts are scored with deterministic checks rather than an LLM judge, so a failure points at a
-specific rule. The scorers have their own tests (`tests/test_evals.py`), including a check that a
+| `judge` | 16 | the groundedness judge itself: 8 drafts with an invented fact (four are real outputs from the first two runs, e.g. the salary range) and 8 grounded drafts. It must flag the first and pass the second |
+
+Drafts are scored by deterministic checks, so most failures point at a specific rule, plus an
+**LLM groundedness judge** (`evals/judge.py`) for what rules can't see: a claim the business never
+gave the agent, such as a policy, a team detail or a web page. The judge gets exactly what the
+drafting model got and lists every unsupported claim. Because a judge can be wrong too, it is only
+trusted as far as the `judge` suite shows (`--no-judge` scores drafts by rules alone). The scorers have their own tests (`tests/test_evals.py`), including a check that a
 model answering with the labels scores 100%.
 
 ```bash
@@ -158,9 +163,8 @@ rounds and promised an interview); an application for a role that isn't open was
 skipped**; and when the model did call it an application, the agent **offered and held an
 interview slot for a job that doesn't exist**. The prompts now restrict replies to facts the
 business gave and say "I'll check" otherwise, slots are only offered for open roles, and the
-checks above keep it that way. The confirm suite first scored 95%: "Tuesday works, but could we make it 16:00?" was read as "other"; after defining a different time on an offered day as a reschedule, it scores 100%. Known gap: deterministic checks can't catch every invented fact
-(one reply pointed to a "roles page" the business never mentioned), which is the case for adding
-an LLM judge for groundedness next.
+checks above keep it that way. The confirm suite first scored 95%: "Tuesday works, but could we make it 16:00?" was read as "other"; after defining a different time on an offered day as a reschedule, it scores 100%. Rules couldn't catch every invented fact (one reply pointed to a "roles page" the business
+never mentioned), which is why the groundedness judge was added.
 
 It prints the pass rate per check, latency and cost per 1,000 tasks, writes
 `evals/results/<model>.json`, and exits non-zero if a suite falls below `evals/thresholds.json`.
