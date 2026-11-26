@@ -143,6 +143,25 @@ python -m evals.run                    # all suites, model from .env
 python -m evals.run --suite draft      # one suite
 ```
 
+**Baseline** (gpt-5.4-mini, `evals/results/gpt-5.4-mini.json`):
+
+| Suite | All checks pass | p50 latency | Cost per 1k tasks |
+|---|---|---|---|
+| triage | 100% (30/30) | 0.95 s | $0.39 |
+| confirm | 95% (19/20) | 0.87 s | $0.24 |
+| draft | 100% (12/12) | 1.16 s | $0.60 |
+
+**What the first run caught.** Every unit test passed, because they use a fake model. The first
+eval run against the real one found three things they couldn't: a draft told a candidate a
+**salary range that exists nowhere** in the business profile (and other drafts invented interview
+rounds and promised an interview); an application for a role that isn't open was **silently
+skipped**; and when the model did call it an application, the agent **offered and held an
+interview slot for a job that doesn't exist**. The prompts now restrict replies to facts the
+business gave and say "I'll check" otherwise, slots are only offered for open roles, and the
+checks above keep it that way. Known gap: deterministic checks can't catch every invented fact
+(one reply pointed to a "roles page" the business never mentioned), which is the case for adding
+an LLM judge for groundedness next.
+
 It prints the pass rate per check, latency and cost per 1,000 tasks, writes
 `evals/results/<model>.json`, and exits non-zero if a suite falls below `evals/thresholds.json`.
 The `evals` workflow runs it on every pull request that touches a prompt, the business profile or

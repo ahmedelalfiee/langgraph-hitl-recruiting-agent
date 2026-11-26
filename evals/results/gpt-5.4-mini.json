@@ -1,0 +1,929 @@
+{
+  "model": "gpt-5.4-mini",
+  "triage": {
+    "summary": {
+      "cases": 30,
+      "all_checks_pass_pct": 100.0,
+      "check_pass_pct": {
+        "kind": 100.0,
+        "name": 100.0,
+        "role": 100.0
+      },
+      "p50_seconds": 0.95,
+      "failures": {},
+      "cost_per_1k_tasks_usd": 0.392
+    },
+    "rows": [
+      {
+        "id": "t01",
+        "seconds": 1.22,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "application",
+          "role": "Senior Frontend Developer",
+          "candidate_first_name": "Omar",
+          "summary": "Omar is applying for the Senior Frontend Developer role and has six years of React and TypeScript experience, most recently at a fintech in Lisbon."
+        }
+      },
+      {
+        "id": "t02",
+        "seconds": 1.04,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "candidate_question",
+          "role": "Backend Developer",
+          "candidate_first_name": "Inês",
+          "summary": "Inês Carvalho is asking whether the Backend Developer role is still open; she works mostly in Go with some Python and is based in Porto."
+        }
+      },
+      {
+        "id": "t03",
+        "seconds": 1.28,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "application",
+          "role": "Product Designer",
+          "candidate_first_name": "Lukas",
+          "summary": "Lukas Weber is applying for the Product Designer role; he has 5 years of B2B SaaS product design experience, uses Figma, and shared his portfolio at weberdesign.de."
+        }
+      },
+      {
+        "id": "t04",
+        "seconds": 0.89,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "application",
+          "role": "Backend Developer",
+          "candidate_first_name": "Miguel",
+          "summary": "Miguel Santos is applying for the Backend Developer role and says he has 4 years of Python experience."
+        }
+      },
+      {
+        "id": "t05",
+        "seconds": 0.93,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "application",
+          "role": "Senior Frontend Developer",
+          "candidate_first_name": "Jordan",
+          "summary": "Jordan Lee is applying for the Senior Frontend Developer role and mentions React, Next.js, TypeScript, and being remote from Valencia."
+        }
+      },
+      {
+        "id": "t06",
+        "seconds": 0.99,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "application",
+          "role": "Backend Developer",
+          "candidate_first_name": "Priya",
+          "summary": "Priya Nair is applying for the Backend Developer role and says she has three years of Go experience building payment APIs."
+        }
+      },
+      {
+        "id": "t07",
+        "seconds": 1.04,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "application",
+          "role": "Product Designer",
+          "candidate_first_name": "Ana",
+          "summary": "Ana Ribeiro applied for the Product Designer role and mentioned B2B SaaS experience."
+        }
+      },
+      {
+        "id": "t08",
+        "seconds": 1.1,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "application",
+          "role": "Senior Frontend Developer",
+          "candidate_first_name": "Tom",
+          "summary": "Tom Brennan is applying for the Senior Frontend Developer role; he has frontend startup experience and is open to remote work, with a CV attached."
+        }
+      },
+      {
+        "id": "t09",
+        "seconds": 0.84,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "application",
+          "role": "Backend Developer",
+          "candidate_first_name": "Yuki",
+          "summary": "Yuki is applying for the Backend Developer role and has Python experience (Django, FastAPI); based in Lisbon."
+        }
+      },
+      {
+        "id": "t10",
+        "seconds": 1.18,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "application",
+          "role": "Product Designer",
+          "candidate_first_name": "Carla",
+          "summary": "Carla is applying for the Product Designer role and says she works mainly in Figma on B2B dashboards."
+        }
+      },
+      {
+        "id": "t11",
+        "seconds": 0.96,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "application",
+          "role": null,
+          "candidate_first_name": "David",
+          "summary": "David Kim is applying for a Data Scientist position and mentions a PhD in statistics and 3 years of ML experience."
+        }
+      },
+      {
+        "id": "t12",
+        "seconds": 0.88,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "candidate_question",
+          "role": null,
+          "candidate_first_name": "Sofia",
+          "summary": "Sofia is asking whether there are any openings for a Marketing Manager role and wants to send her CV."
+        }
+      },
+      {
+        "id": "t13",
+        "seconds": 1.02,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "candidate_question",
+          "role": "Senior Frontend Developer",
+          "candidate_first_name": "Omar",
+          "summary": "Omar is asking whether the Senior Frontend Developer role is fully remote or hybrid in Lisbon before applying."
+        }
+      },
+      {
+        "id": "t14",
+        "seconds": 0.95,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "candidate_question",
+          "role": "Backend Developer",
+          "candidate_first_name": "Inês",
+          "summary": "Candidate is asking for the salary range for the Backend Developer position."
+        }
+      },
+      {
+        "id": "t15",
+        "seconds": 0.85,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "candidate_question",
+          "role": "Product Designer",
+          "candidate_first_name": "Lukas",
+          "summary": "Lukas is asking about the interview process for the Product Designer role, specifically the number of rounds and whether there is a design task."
+        }
+      },
+      {
+        "id": "t16",
+        "seconds": 0.83,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "candidate_question",
+          "role": "Backend Developer",
+          "candidate_first_name": "Mark",
+          "summary": "Mark is asking whether the Backend Developer role offers relocation or visa sponsorship, as he is based in Dublin and would need to relocate."
+        }
+      },
+      {
+        "id": "t17",
+        "seconds": 1.01,
+        "checks": {
+          "kind": true
+        },
+        "output": {
+          "kind": "spam",
+          "role": null,
+          "candidate_first_name": "SEO Growth",
+          "summary": "Unsolicited SEO marketing pitch promising page-one rankings and a limited-time discount."
+        }
+      },
+      {
+        "id": "t18",
+        "seconds": 0.89,
+        "checks": {
+          "kind": true
+        },
+        "output": {
+          "kind": "spam",
+          "role": null,
+          "candidate_first_name": null,
+          "summary": "Promotional investment scam email advertising guaranteed 12% weekly returns from an AI trading bot."
+        }
+      },
+      {
+        "id": "t19",
+        "seconds": 0.89,
+        "checks": {
+          "kind": true
+        },
+        "output": {
+          "kind": "spam",
+          "role": null,
+          "candidate_first_name": null,
+          "summary": "Unsolicited prize offer requesting bank details and a processing fee; likely a phishing/scam email."
+        }
+      },
+      {
+        "id": "t20",
+        "seconds": 1.12,
+        "checks": {
+          "kind": true
+        },
+        "output": {
+          "kind": "spam",
+          "role": null,
+          "candidate_first_name": "Lead Gen",
+          "summary": "Promotional email selling a purchased list of verified HR contacts in Europe, not a job application or candidate inquiry."
+        }
+      },
+      {
+        "id": "t21",
+        "seconds": 0.84,
+        "checks": {
+          "kind": true
+        },
+        "output": {
+          "kind": "other",
+          "role": null,
+          "candidate_first_name": null,
+          "summary": "Invoice email from CloudHost billing for November, amount due €39.00."
+        }
+      },
+      {
+        "id": "t22",
+        "seconds": 0.84,
+        "checks": {
+          "kind": true
+        },
+        "output": {
+          "kind": "other",
+          "role": null,
+          "candidate_first_name": "Joana",
+          "summary": "ClientCorp wants to open two more frontend positions in January and is requesting a call next week to discuss the brief."
+        }
+      },
+      {
+        "id": "t23",
+        "seconds": 0.8,
+        "checks": {
+          "kind": true
+        },
+        "output": {
+          "kind": "other",
+          "role": null,
+          "candidate_first_name": null,
+          "summary": "Calendar reminder for a Team sync meeting on Thursday from 10:00 to 10:30 in Lisbon."
+        }
+      },
+      {
+        "id": "t24",
+        "seconds": 0.86,
+        "checks": {
+          "kind": true
+        },
+        "output": {
+          "kind": "other",
+          "role": null,
+          "candidate_first_name": "Rui",
+          "summary": "Rui is asking Sara to meet for lunch at 1pm at the usual place."
+        }
+      },
+      {
+        "id": "t25",
+        "seconds": 0.83,
+        "checks": {
+          "kind": true
+        },
+        "output": {
+          "kind": "spam",
+          "role": null,
+          "candidate_first_name": null,
+          "summary": "LinkedIn promotional message encouraging a Premium upgrade; not a job application or candidate inquiry."
+        }
+      },
+      {
+        "id": "t26",
+        "seconds": 0.91,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "application",
+          "role": "Backend Developer",
+          "candidate_first_name": "Peter",
+          "summary": "Peter Novak is applying for the Backend Developer role, was referred by Ana Ribeiro, and says he writes Go at a logistics company with his CV attached."
+        }
+      },
+      {
+        "id": "t27",
+        "seconds": 0.94,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "application",
+          "role": "Senior Frontend Developer",
+          "candidate_first_name": "Laura",
+          "summary": "Laura is applying for the Senior Frontend Developer and Product Designer roles and asks which would be a better fit."
+        }
+      },
+      {
+        "id": "t28",
+        "seconds": 1.09,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "candidate_question",
+          "role": "Senior Frontend Developer",
+          "candidate_first_name": "Ahmed",
+          "summary": "Ahmed followed up on his Senior Frontend Developer application from two weeks ago and asked whether the position is still open."
+        }
+      },
+      {
+        "id": "t29",
+        "seconds": 1.06,
+        "checks": {
+          "kind": true,
+          "role": true,
+          "name": true
+        },
+        "output": {
+          "kind": "candidate_question",
+          "role": "Product Designer",
+          "candidate_first_name": "Mia",
+          "summary": "Mia Schmidt is withdrawing her application for the Product Designer role after accepting another offer."
+        }
+      },
+      {
+        "id": "t30",
+        "seconds": 1.03,
+        "checks": {
+          "kind": true
+        },
+        "output": {
+          "kind": "other",
+          "role": "Backend Developer",
+          "candidate_first_name": null,
+          "summary": "Job board renewal notice that the Backend Developer listing expires in 3 days."
+        }
+      }
+    ]
+  },
+  "confirm": {
+    "summary": {
+      "cases": 20,
+      "all_checks_pass_pct": 95.0,
+      "check_pass_pct": {
+        "decision": 95.0,
+        "slot": 100.0
+      },
+      "p50_seconds": 0.87,
+      "failures": {
+        "c10": [
+          "decision"
+        ]
+      },
+      "cost_per_1k_tasks_usd": 0.239
+    },
+    "rows": [
+      {
+        "id": "c01",
+        "seconds": 0.88,
+        "checks": {
+          "decision": true,
+          "slot": true
+        },
+        "output": {
+          "decision": "confirm",
+          "slot_index": 0,
+          "summary": "Candidate confirmed Tuesday 24 November at 15:00."
+        }
+      },
+      {
+        "id": "c02",
+        "seconds": 0.82,
+        "checks": {
+          "decision": true,
+          "slot": true
+        },
+        "output": {
+          "decision": "confirm",
+          "slot_index": 1,
+          "summary": "Candidate accepted the Wednesday 25 November at 11:00 slot."
+        }
+      },
+      {
+        "id": "c03",
+        "seconds": 0.99,
+        "checks": {
+          "decision": true,
+          "slot": true
+        },
+        "output": {
+          "decision": "confirm",
+          "slot_index": 1,
+          "summary": "Candidate accepted Wednesday 25 November at 11:00."
+        }
+      },
+      {
+        "id": "c04",
+        "seconds": 0.87,
+        "checks": {
+          "decision": true,
+          "slot": true
+        },
+        "output": {
+          "decision": "confirm",
+          "slot_index": 0,
+          "summary": "Candidate confirmed the first offered interview slot."
+        }
+      },
+      {
+        "id": "c05",
+        "seconds": 0.8,
+        "checks": {
+          "decision": true,
+          "slot": true
+        },
+        "output": {
+          "decision": "confirm",
+          "slot_index": 1,
+          "summary": "Candidate confirmed the Wednesday 25 November at 11:00 slot."
+        }
+      },
+      {
+        "id": "c06",
+        "seconds": 0.83,
+        "checks": {
+          "decision": true,
+          "slot": true
+        },
+        "output": {
+          "decision": "confirm",
+          "slot_index": 0,
+          "summary": "Candidate confirmed the Tuesday 24 November at 15:00 slot."
+        }
+      },
+      {
+        "id": "c07",
+        "seconds": 1.01,
+        "checks": {
+          "decision": true,
+          "slot": true
+        },
+        "output": {
+          "decision": "confirm",
+          "slot_index": 0,
+          "summary": "Candidate confirmed Tuesday 24 November at 15:00."
+        }
+      },
+      {
+        "id": "c08",
+        "seconds": 0.81,
+        "checks": {
+          "decision": true
+        },
+        "output": {
+          "decision": "reschedule",
+          "slot_index": null,
+          "summary": "Candidate asked for Thursday instead and did not accept either offered slot."
+        }
+      },
+      {
+        "id": "c09",
+        "seconds": 0.87,
+        "checks": {
+          "decision": true
+        },
+        "output": {
+          "decision": "reschedule",
+          "slot_index": null,
+          "summary": "Candidate is traveling that week and asked for options the following week."
+        }
+      },
+      {
+        "id": "c10",
+        "seconds": 0.99,
+        "checks": {
+          "decision": false
+        },
+        "output": {
+          "decision": "other",
+          "slot_index": null,
+          "summary": "Candidate is interested in Tuesday but requested a time change to 16:00, so no offered slot was clearly accepted."
+        }
+      },
+      {
+        "id": "c11",
+        "seconds": 0.91,
+        "checks": {
+          "decision": true
+        },
+        "output": {
+          "decision": "reschedule",
+          "slot_index": null,
+          "summary": "Candidate cannot do either offered slot and can only do mornings before 10."
+        }
+      },
+      {
+        "id": "c12",
+        "seconds": 0.78,
+        "checks": {
+          "decision": true
+        },
+        "output": {
+          "decision": "decline",
+          "slot_index": null,
+          "summary": "Candidate has accepted another offer and is withdrawing from consideration."
+        }
+      },
+      {
+        "id": "c13",
+        "seconds": 0.94,
+        "checks": {
+          "decision": true
+        },
+        "output": {
+          "decision": "decline",
+          "slot_index": null,
+          "summary": "Candidate has declined the interview and decided to stay at their current company."
+        }
+      },
+      {
+        "id": "c14",
+        "seconds": 0.79,
+        "checks": {
+          "decision": true
+        },
+        "output": {
+          "decision": "other",
+          "slot_index": null,
+          "summary": "Candidate is asking about the interview format rather than accepting a slot."
+        }
+      },
+      {
+        "id": "c15",
+        "seconds": 0.79,
+        "checks": {
+          "decision": true
+        },
+        "output": {
+          "decision": "other",
+          "slot_index": null,
+          "summary": "Candidate is asking who the interviewer will be, not confirming a slot."
+        }
+      },
+      {
+        "id": "c16",
+        "seconds": 0.87,
+        "checks": {
+          "decision": true
+        },
+        "output": {
+          "decision": "other",
+          "slot_index": null,
+          "summary": "The candidate said either slot works, but did not clearly choose one."
+        }
+      },
+      {
+        "id": "c17",
+        "seconds": 0.78,
+        "checks": {
+          "decision": true
+        },
+        "output": {
+          "decision": "other",
+          "slot_index": null,
+          "summary": "The candidate expressed enthusiasm but did not specify which interview slot they want."
+        }
+      },
+      {
+        "id": "c18",
+        "seconds": 1.03,
+        "checks": {
+          "decision": true
+        },
+        "output": {
+          "decision": "other",
+          "slot_index": null,
+          "summary": "Candidate will review their calendar and respond tomorrow."
+        }
+      },
+      {
+        "id": "c19",
+        "seconds": 0.78,
+        "checks": {
+          "decision": true,
+          "slot": true
+        },
+        "output": {
+          "decision": "confirm",
+          "slot_index": 1,
+          "summary": "Candidate accepted Wednesday 25 November at 11:00 and asked whether the role is open to people in Spain."
+        }
+      },
+      {
+        "id": "c20",
+        "seconds": 0.75,
+        "checks": {
+          "decision": true
+        },
+        "output": {
+          "decision": "other",
+          "slot_index": null,
+          "summary": "Candidate asked to confirm the time zone before accepting a slot."
+        }
+      }
+    ]
+  },
+  "draft": {
+    "summary": {
+      "cases": 12,
+      "all_checks_pass_pct": 100.0,
+      "check_pass_pct": {
+        "defers_unknown": 100.0,
+        "ends_with_signature": 100.0,
+        "mentions_meet_link": 100.0,
+        "no_em_dash": 100.0,
+        "no_invented_days": 100.0,
+        "no_invented_money": 100.0,
+        "no_invented_times": 100.0,
+        "no_markdown": 100.0,
+        "no_slot_offered": 100.0,
+        "offers_first_slot": 100.0,
+        "word_count": 100.0
+      },
+      "p50_seconds": 1.16,
+      "failures": {},
+      "cost_per_1k_tasks_usd": 0.604
+    },
+    "rows": [
+      {
+        "id": "d01",
+        "seconds": 0.95,
+        "checks": {
+          "ends_with_signature": true,
+          "no_invented_times": true,
+          "no_invented_days": true,
+          "word_count": true,
+          "no_em_dash": true,
+          "no_markdown": true,
+          "no_invented_money": true,
+          "offers_first_slot": true,
+          "mentions_meet_link": true
+        },
+        "output": "Hi Omar,\n\nThanks for your application. The first available slot is Tuesday 24 November at 15:00, with Wednesday 25 November at 11:00 as a backup. It will be a 30-minute video call, and I’ll send the Google Meet link once you confirm.\n\nBest,\nSara\nTalent Co. Recruiting"
+      },
+      {
+        "id": "d02",
+        "seconds": 1.5,
+        "checks": {
+          "ends_with_signature": true,
+          "no_invented_times": true,
+          "no_invented_days": true,
+          "word_count": true,
+          "no_em_dash": true,
+          "no_markdown": true,
+          "no_invented_money": true,
+          "offers_first_slot": true,
+          "mentions_meet_link": true
+        },
+        "output": "Hi Inês,\n\nThanks for your email and for sharing your CV. The Backend Developer role is still open.\n\nWe have a 30-minute video call available on Tuesday, 24 November at 15:00. If that does not work, Wednesday, 25 November at 11:00 is also free.\n\nIf you confirm a slot, I’ll send the Google Meet link after.\n\nBest,\nSara\nTalent Co. Recruiting"
+      },
+      {
+        "id": "d03",
+        "seconds": 1.1,
+        "checks": {
+          "ends_with_signature": true,
+          "no_invented_times": true,
+          "no_invented_days": true,
+          "word_count": true,
+          "no_em_dash": true,
+          "no_markdown": true,
+          "no_invented_money": true,
+          "offers_first_slot": true,
+          "mentions_meet_link": true
+        },
+        "output": "Hi Lukas,\n\nThanks for your email and for sharing your portfolio. Your background sounds like a good fit for our Product Designer role.\n\nWould Tuesday 24 November at 15:00 work for a 30-minute Google Meet? If not, Wednesday 25 November at 11:00 is a good backup.\n\nOnce you confirm, I’ll send the Google Meet link.\n\nBest,\nSara\nTalent Co. Recruiting"
+      },
+      {
+        "id": "d04",
+        "seconds": 1.16,
+        "checks": {
+          "ends_with_signature": true,
+          "no_invented_times": true,
+          "no_invented_days": true,
+          "word_count": true,
+          "no_em_dash": true,
+          "no_markdown": true,
+          "no_invented_money": true,
+          "offers_first_slot": true,
+          "mentions_meet_link": true
+        },
+        "output": "Olá Miguel,\n\nObrigado pelo teu CV e pelo interesse na vaga de Backend Developer.\n\nTenho uma slot disponível na terça-feira, 24 de novembro, às 15:00. Se não te der jeito, posso também reservar a quarta-feira, 25 de novembro, às 11:00.\n\nA conversa será por videochamada de 30 minutos, e envio-te o link do Google Meet depois de confirmares.\n\nBest,\nSara\nTalent Co. Recruiting"
+      },
+      {
+        "id": "d05",
+        "seconds": 1.27,
+        "checks": {
+          "ends_with_signature": true,
+          "no_invented_times": true,
+          "no_invented_days": true,
+          "word_count": true,
+          "no_em_dash": true,
+          "no_markdown": true,
+          "no_invented_money": true,
+          "offers_first_slot": true,
+          "mentions_meet_link": true
+        },
+        "output": "Hi Priya,\n\nThanks for your application and for sharing your Go experience with payment APIs. We’d like to invite you to a 30-minute video call.\n\nOur first slot is Tuesday 24 November at 15:00, with Wednesday 25 November at 11:00 as a backup. If that works, please confirm and I’ll send the Google Meet link.\n\nBest,\nSara\nTalent Co. Recruiting"
+      },
+      {
+        "id": "d06",
+        "seconds": 1.11,
+        "checks": {
+          "ends_with_signature": true,
+          "no_invented_times": true,
+          "no_invented_days": true,
+          "word_count": true,
+          "no_em_dash": true,
+          "no_markdown": true,
+          "no_invented_money": true,
+          "no_slot_offered": true
+        },
+        "output": "Hi David,\n\nThanks for reaching out and for sending your CV. We’re not hiring for a Data Scientist role at the moment, so I can’t move this one forward right now. If a matching role opens up, I’d be glad to keep you in mind.\n\nBest,\nSara\nTalent Co. Recruiting"
+      },
+      {
+        "id": "d07",
+        "seconds": 1.21,
+        "checks": {
+          "ends_with_signature": true,
+          "no_invented_times": true,
+          "no_invented_days": true,
+          "word_count": true,
+          "no_em_dash": true,
+          "no_markdown": true,
+          "no_invented_money": true,
+          "no_slot_offered": true
+        },
+        "output": "Hi Sofia,\n\nThanks for reaching out. We don’t have a marketing manager opening at the moment.\n\nIf you’d like, you can keep an eye on our roles page, and feel free to reach out again if a relevant role comes up.\n\nBest,\nSara\nTalent Co. Recruiting"
+      },
+      {
+        "id": "d08",
+        "seconds": 0.83,
+        "checks": {
+          "ends_with_signature": true,
+          "no_invented_times": true,
+          "no_invented_days": true,
+          "word_count": true,
+          "no_em_dash": true,
+          "no_markdown": true,
+          "no_invented_money": true,
+          "no_slot_offered": true
+        },
+        "output": "Hi Omar,\n\nThanks for checking. The Senior Frontend Developer role is remote or based in Lisbon. It is not hybrid.\n\nBest,\nSara\nTalent Co. Recruiting"
+      },
+      {
+        "id": "d09",
+        "seconds": 1.18,
+        "checks": {
+          "ends_with_signature": true,
+          "no_invented_times": true,
+          "no_invented_days": true,
+          "word_count": true,
+          "no_em_dash": true,
+          "no_markdown": true,
+          "no_invented_money": true,
+          "defers_unknown": true,
+          "no_slot_offered": true
+        },
+        "output": "Hi Inês,\n\nThanks for asking. For the Backend Developer role, we can share the salary range after we review the current details with the team. I’ll check and get back to you.\n\nBest,\nSara\nTalent Co. Recruiting"
+      },
+      {
+        "id": "d10",
+        "seconds": 1.05,
+        "checks": {
+          "ends_with_signature": true,
+          "no_invented_times": true,
+          "no_invented_days": true,
+          "word_count": true,
+          "no_em_dash": true,
+          "no_markdown": true,
+          "no_invented_money": true,
+          "defers_unknown": true,
+          "no_slot_offered": true
+        },
+        "output": "Hi Lukas,\n\nThanks for your message. For the Product Designer role, the interview is a 30-minute video call on Google Meet. I don’t have the full interview step details or whether there’s a design task yet, so I’ll check and get back to you.\n\nBest,\nSara\nTalent Co. Recruiting"
+      },
+      {
+        "id": "d11",
+        "seconds": 1.04,
+        "checks": {
+          "ends_with_signature": true,
+          "no_invented_times": true,
+          "no_invented_days": true,
+          "word_count": true,
+          "no_em_dash": true,
+          "no_markdown": true,
+          "no_invented_money": true,
+          "defers_unknown": true,
+          "no_slot_offered": true
+        },
+        "output": "Hi Ahmed,\n\nThanks for following up. Yes, the Senior Frontend Developer role is still open.\n\nIf you'd like to continue, I can arrange a 30-minute video call. I don't have free slots to share right now, so please send me your availability and I'll check what works.\n\nBest,\nSara\nTalent Co. Recruiting"
+      },
+      {
+        "id": "d12",
+        "seconds": 1.39,
+        "checks": {
+          "ends_with_signature": true,
+          "no_invented_times": true,
+          "no_invented_days": true,
+          "word_count": true,
+          "no_em_dash": true,
+          "no_markdown": true,
+          "no_invented_money": true,
+          "offers_first_slot": true,
+          "mentions_meet_link": true
+        },
+        "output": "Hi Tom,\n\nThanks for reaching out and for sharing your CV. The Senior Frontend Developer role is open, and your background sounds relevant.\n\nWould Tuesday 24 November at 15:00 work for a 30-minute Google Meet? If not, Wednesday 25 November at 11:00 is a backup option.\n\nOnce you confirm, I’ll send the Google Meet link.\n\nBest,\nSara\nTalent Co. Recruiting"
+      }
+    ]
+  }
+}

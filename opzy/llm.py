@@ -71,7 +71,8 @@ Reply with JSON only:
 {{"decision": "confirm" | "reschedule" | "decline" | "other",
   "slot_index": <0-based index of the offered slot they accepted, or null>,
   "summary": "<one short sentence for the owner>"}}
-"confirm" only if they clearly accept one of the offered slots."""
+"confirm" only if they clearly accept one of the offered slots exactly as offered.
+"reschedule" if they ask for a different day or time, including a different time on an offered day."""
 
 
 def _slots_text(slots: list[dict]) -> str:
