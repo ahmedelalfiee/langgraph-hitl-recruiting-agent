@@ -41,7 +41,7 @@ def _email(e: dict) -> dict:
     return {"id": "eval", "thread_id": "eval", "from_email": "", "message_id_header": "", **e}
 
 
-def run_suite(name: str, llm, biz, limit: int | None = None, judge=None) -> dict:
+def run_suite(name: str, llm, biz, limit: int | None = None, judge=None, gate_on_judge: bool = False) -> dict:
     rows = []
     drafts = {c["id"]: c for c in load("draft", None)} if name == "judge" else {}
     for case in load(name, limit):
@@ -58,8 +58,9 @@ def run_suite(name: str, llm, biz, limit: int | None = None, judge=None) -> dict
                 checks = score_draft(case, out, biz.signature)
                 if judge is not None:
                     verdict = judge_draft(judge, biz, case, out)
-                    checks["grounded"] = verdict["grounded"]
-                    out = {"draft": out, "unsupported": verdict["unsupported"]}
+                    if gate_on_judge:
+                        checks["grounded"] = verdict["grounded"]
+                    out = {"draft": out, "grounded": verdict["grounded"], "unsupported": verdict["unsupported"]}
             else:  # "judge": is the judge right about drafts whose answer we know?
                 verdict = judge_draft(judge or llm, biz, drafts[case["draft"]], case["text"])
                 out = verdict
@@ -68,6 +69,11 @@ def run_suite(name: str, llm, biz, limit: int | None = None, judge=None) -> dict
             out, checks = {"error": f"{type(err).__name__}: {err}"}, {"ran": False}
         rows.append({"id": case["id"], "seconds": round(time.perf_counter() - t0, 2), "checks": checks, "output": out})
     report = summarise(rows)
+    judged = [r["output"]["grounded"] for r in rows if isinstance(r["output"], dict) and "grounded" in r["output"]]
+    if name == "draft" and judged:  # the judge's view, shown even while it is only advisory
+        report["judge_grounded_pct"] = round(100 * sum(judged) / len(judged), 1)
+        report["judge_flags"] = {r["id"]: r["output"]["unsupported"] for r in rows
+                                 if isinstance(r["output"], dict) and r["output"].get("unsupported")}
     secs = sorted(r["seconds"] for r in rows)
     report["p50_seconds"] = secs[len(secs) // 2] if secs else None
     report["failures"] = {r["id"]: [k for k, v in r["checks"].items() if not v] for r in rows
@@ -94,7 +100,7 @@ def main(argv=None) -> int:
     for name in suites:
         zero = {"calls": 0, "input_tokens": 0, "output_tokens": 0}
         b_llm, b_judge = dict(llm.usage or zero), dict((judge.usage if judge else None) or zero)
-        res = run_suite(name, llm, biz, args.limit, judge)
+        res = run_suite(name, llm, biz, args.limit, judge, gate_on_judge=thresholds.get("judge_gates_drafts", False))
         s = res["summary"]
         # the agent's own cost per task, and separately what the judge costs to run
         for label, client, before in (("cost_per_1k_tasks_usd", llm, b_llm),
@@ -117,6 +123,11 @@ def main(argv=None) -> int:
             print(f"    {check:22s} {pct:5.1f}%")
         if s["failures"]:
             print("    failed:", ", ".join(f"{k} ({'/'.join(v)})" for k, v in s["failures"].items()))
+        if "judge_grounded_pct" in s:
+            gate = "gating" if thresholds.get("judge_gates_drafts") else "advisory"
+            print(f"    judge: {s['judge_grounded_pct']}% grounded ({gate})")
+            for k, v in s["judge_flags"].items():
+                print(f"      {k}: {'; '.join(v)[:160]}")
         results[name] = res
     out_dir = HERE / "results"
     out_dir.mkdir(exist_ok=True)

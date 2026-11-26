@@ -96,11 +96,11 @@ implementations, picked from whichever key is configured.
 
 ## Tests
 
-46 tests (the end-to-end flows plus the eval scorers) run against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
+48 tests (the end-to-end flows plus the eval scorers) run against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -q        # 46 passed
+python -m pytest -q        # 48 passed
 ```
 
 They cover the guarantees that matter:
@@ -143,7 +143,17 @@ drafting model got and, for every factual claim, must quote the words in the sou
 it; the quotes are checked in code, so it can't invent its own evidence. (A first version that
 just listed "unsupported claims" caught all 8 invented facts but also flagged 7 of 8 honest
 drafts, including the offered slots.) Because a judge can be wrong too, it is only
-trusted as far as the `judge` suite shows (`--no-judge` scores drafts by rules alone). The scorers have their own tests (`tests/test_evals.py`), including a check that a
+trusted as far as the `judge` suite shows (`--no-judge` scores drafts by rules alone).
+
+**The judge is advisory for now.** Over three iterations it went from flagging 7 of 8 honest
+drafts to catching **all 8 invented facts** while still over-flagging some polite sentences
+(69% on its labelled set). Gating CI on a check that is wrong a third of the time would teach
+everyone to ignore it, so its verdict on every draft is reported (`judge_grounded_pct` and the
+flagged claims) but not enforced until it clears the `judge` threshold; then set
+`judge_gates_drafts` to true. It has already paid for itself: it caught drafts promising to
+*"keep your CV on file for future roles"*, a data-protection commitment the business never made,
+which no rule could see. The drafting prompt now forbids it. Known blind spot: deferrals are
+filtered in code, so an invented claim containing a word like "check" would slip through. The scorers have their own tests (`tests/test_evals.py`), including a check that a
 model answering with the labels scores 100%.
 
 ```bash

@@ -56,7 +56,9 @@ If it is a question, answer it simply.
 Only state facts given above (roles and their notes, the interview format, the free slots).
 If they ask about anything else, such as salary, visa or relocation, the number of rounds, tasks,
 or where their application stands, say you'll check and get back to them. Never invent numbers,
-policies or promises: this email is sent in the business's name.
+policies or promises: this email is sent in the business's name. In particular, don't promise to
+keep their CV on file or to contact them about future roles: storing someone's CV is a data
+decision only the business can make.
 End with exactly this signature:
 {signature}"""
 

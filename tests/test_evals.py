@@ -213,3 +213,32 @@ def test_deferrals_are_not_counted_as_invented_facts():
                     ' {"claim": "I don\'t have the full details yet", "support": "NONE"}]}')
 
     assert judge_draft(Judge(), BIZ, load("draft", None)[9], "x")["grounded"] is True
+
+
+def test_courtesy_sentences_are_never_flagged():
+    """From a real run: thanks, sign-offs and compliments were listed as unsupported claims."""
+    from evals.judge import judge_draft
+
+    class Judge:
+        def _ask(self, prompt, max_tokens=600):
+            return ('{"claims": [{"claim": "Thanks for sending your CV.", "type": "courtesy", "support": "NONE"},'
+                    ' {"claim": "Your background sounds relevant.", "type": "courtesy", "support": "NONE"},'
+                    ' {"claim": "I\'ll keep your CV on file.", "type": "commitment", "support": "NONE"}]}')
+
+    v = judge_draft(Judge(), BIZ, load("draft", None)[0], "x")
+    assert v["unsupported"] == ["I'll keep your CV on file."]
+
+
+def test_judge_verdict_is_advisory_unless_it_gates():
+    from opzy.llm import PromptLLM
+
+    class Judge(PromptLLM):  # drafts GOOD, and as the judge flags an invented relocation policy
+        def _ask(self, prompt, max_tokens=600):
+            if '"claims"' in prompt:
+                return '{"claims": [{"claim": "We offer relocation.", "type": "fact", "support": "NONE"}]}'
+            return GOOD
+
+    advisory = run_suite("draft", Judge(), BIZ, limit=1, judge=Judge())
+    gating = run_suite("draft", Judge(), BIZ, limit=1, judge=Judge(), gate_on_judge=True)
+    assert "grounded" not in advisory["rows"][0]["checks"] and advisory["summary"]["judge_grounded_pct"] == 0.0
+    assert gating["rows"][0]["checks"]["grounded"] is False

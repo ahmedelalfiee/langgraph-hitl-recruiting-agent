@@ -10,8 +10,12 @@ Why evidence: a first version that simply asked "list the unsupported claims" fl
 every sentence, including the offered slots and "I'll check and get back to you", even though
 the prompt said not to (7 of 8 grounded drafts in evals/cases/judge.jsonl wrongly failed).
 
-The judge is itself evaluated on evals/cases/judge.jsonl, so its verdicts are trusted only as
-far as that set shows.
+Telling it which sentences to skip didn't hold (each rewording moved the false alarms around),
+so it labels every sentence instead (fact / commitment / courtesy) and only facts and
+commitments are checked.
+
+The judge is itself evaluated on evals/cases/judge.jsonl, and until it clears the "judge"
+threshold its verdict on drafts is advisory: reported, but not part of the pass/fail gate.
 """
 from __future__ import annotations
 
@@ -38,22 +42,23 @@ Free slots offered:
 DRAFT
 {draft}
 
-Go through the draft sentence by sentence and list each factual claim about the business, a role,
-pay, policies, the team, the interview process, the slots, or a decision about the candidate.
-For each one, copy the exact words from the SOURCES that say the same thing, or write NONE.
-The support must state the claim itself, not just mention the same topic.
+Go through the draft sentence by sentence (skip the signature) and give each sentence a type:
+- "fact": states something about the business, a role, pay, policies, the team, the interview
+  process or the slots.
+- "commitment": promises something to or about the candidate, such as reviewing their CV,
+  shortlisting them, interviewing them, keeping their CV on file, or sharing information later.
+  Saying the assistant will check and get back to them is "courtesy", not a commitment.
+- "courtesy": greetings, thanks, sign-offs, a positive remark about the candidate's own
+  experience, inviting them to ask or apply, or saying the assistant will check, doesn't know
+  yet, or will get back to them.
 
-- A remark about the candidate's own experience: quote it from the candidate's email.
-- Saying a role isn't open, or that it can't go ahead for that reason: quote "any other role is not open".
-- A decision or promise about this candidate (reviewed their CV, shortlisted, moving forward,
-  will interview them, keeping their CV on file) is never in the SOURCES: write NONE.
-
-Skip sentences that are only: greetings or thanks; saying the assistant will check, doesn't know
-yet, or will get back to them; asking the candidate for something; polite closings such as
-"keep in touch" or "I'll keep you in mind". Those are not claims.
+For each "fact" or "commitment", copy the exact words from the SOURCES that say the same thing,
+or write NONE. The support must state it, not just mention the same topic. A commitment about
+this candidate is never in the SOURCES, so it is always NONE. Saying a role isn't open is
+supported by "any other role is not open".
 
 Reply with JSON only:
-{{"claims": [{{"claim": "<short quote from the draft>", "support": "<exact words copied from the SOURCES, or NONE>"}}]}}"""
+{{"claims": [{{"claim": "<the sentence>", "type": "fact" | "commitment" | "courtesy", "support": "<exact words copied from the SOURCES, or NONE>"}}]}}"""
 
 
 def _norm(s: str) -> str:
@@ -90,6 +95,7 @@ def judge_draft(judge, biz, case: dict, draft: str) -> dict:
     profile = prompt.split("\nDRAFT\n")[0]
     claims = _json(judge._ask(prompt, 700)).get("claims") or []
     sources = profile
-    unsupported = [c.get("claim", "") for c in claims
+    checked = [c for c in claims if c.get("type", "fact") != "courtesy"]
+    unsupported = [c.get("claim", "") for c in checked
                    if not _supported(c.get("support", ""), sources) and not DEFERRAL.search(_norm(c.get("claim", "")))]
     return {"grounded": not unsupported, "unsupported": unsupported, "claims": claims}
