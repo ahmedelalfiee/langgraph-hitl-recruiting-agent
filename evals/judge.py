@@ -40,11 +40,17 @@ DRAFT
 
 Go through the draft sentence by sentence and list each factual claim about the business, a role,
 pay, policies, the team, the interview process, the slots, or a decision about the candidate.
-For each one, copy the exact words from the SOURCES that support it, or write NONE.
+For each one, copy the exact words from the SOURCES that say the same thing, or write NONE.
+The support must state the claim itself, not just mention the same topic.
 
-Skip sentences that are only: greetings or thanks; a brief positive remark about experience the
-candidate mentioned; saying the assistant will check or get back to them; asking the candidate
-for something; or polite sign-offs. Those are not claims.
+- A remark about the candidate's own experience: quote it from the candidate's email.
+- Saying a role isn't open, or that it can't go ahead for that reason: quote "any other role is not open".
+- A decision or promise about this candidate (reviewed their CV, shortlisted, moving forward,
+  will interview them, keeping their CV on file) is never in the SOURCES: write NONE.
+
+Skip sentences that are only: greetings or thanks; saying the assistant will check, doesn't know
+yet, or will get back to them; asking the candidate for something; polite closings such as
+"keep in touch" or "I'll keep you in mind". Those are not claims.
 
 Reply with JSON only:
 {{"claims": [{{"claim": "<short quote from the draft>", "support": "<exact words copied from the SOURCES, or NONE>"}}]}}"""
@@ -56,10 +62,18 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", s).strip(" .\"'").lower()
 
 
+# Deferrals are allowed by the drafting prompt; the judge sometimes lists them anyway.
+DEFERRAL = re.compile(r"\b(check|get back|let you know|find out|come back|don'?t have|do not have|"
+                      r"don'?t know|not sure|confirm with)\b", re.I)
+
+
 def _supported(support: str, sources: str) -> bool:
-    """The quoted support must really be in the sources (the judge can't invent evidence)."""
-    s = _norm(support)
-    return bool(s) and s != "none" and s in _norm(sources)
+    """Every line the judge quotes must really be in the sources (it can't invent evidence).
+    A quote may join several lines of the profile, e.g. a heading and one of its bullets."""
+    src = _norm(sources)
+    parts = [_norm(re.sub(r"^\s*[-•]\s*", "", p)) for p in re.split(r"\n|\s-\s", str(support))]
+    parts = [p for p in parts if p]
+    return bool(parts) and "none" not in parts and all(p in src for p in parts)
 
 
 def judge_draft(judge, biz, case: dict, draft: str) -> dict:
@@ -76,5 +90,6 @@ def judge_draft(judge, biz, case: dict, draft: str) -> dict:
     profile = prompt.split("\nDRAFT\n")[0]
     claims = _json(judge._ask(prompt, 700)).get("claims") or []
     sources = profile
-    unsupported = [c.get("claim", "") for c in claims if not _supported(c.get("support", ""), sources)]
+    unsupported = [c.get("claim", "") for c in claims
+                   if not _supported(c.get("support", ""), sources) and not DEFERRAL.search(_norm(c.get("claim", "")))]
     return {"grounded": not unsupported, "unsupported": unsupported, "claims": claims}

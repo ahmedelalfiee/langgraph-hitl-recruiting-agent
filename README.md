@@ -96,11 +96,11 @@ implementations, picked from whichever key is configured.
 
 ## Tests
 
-44 tests (the end-to-end flows plus the eval scorers) run against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
+46 tests (the end-to-end flows plus the eval scorers) run against fake Gmail, Calendar, WhatsApp and LLM, so no keys are needed:
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -q        # 44 passed
+python -m pytest -q        # 46 passed
 ```
 
 They cover the guarantees that matter:

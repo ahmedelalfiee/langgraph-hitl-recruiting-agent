@@ -193,3 +193,23 @@ def test_judge_set_has_both_kinds_of_example():
     drafts = {c["id"] for c in load("draft", None)}
     assert {r["grounded"] for r in rows} == {True, False}
     assert all(r["draft"] in drafts for r in rows)
+
+
+def test_support_may_join_a_heading_and_a_bullet():
+    """From a real run: the judge quoted "Free slots offered:\\n- Wednesday ..." skipping Tuesday."""
+    from evals.judge import _supported
+
+    src = "Free slots offered:\n- Tuesday 24 November at 15:00\n- Wednesday 25 November at 11:00"
+    assert _supported("Free slots offered:\n- Wednesday 25 November at 11:00", src)
+    assert not _supported("Free slots offered:\n- Thursday 26 November at 11:00", src)
+
+
+def test_deferrals_are_not_counted_as_invented_facts():
+    from evals.judge import judge_draft
+
+    class Judge:
+        def _ask(self, prompt, max_tokens=600):
+            return ('{"claims": [{"claim": "I can check on the number of rounds and get back to you", "support": "NONE"},'
+                    ' {"claim": "I don\'t have the full details yet", "support": "NONE"}]}')
+
+    assert judge_draft(Judge(), BIZ, load("draft", None)[9], "x")["grounded"] is True
