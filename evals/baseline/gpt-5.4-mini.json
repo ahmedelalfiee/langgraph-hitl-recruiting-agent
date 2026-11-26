@@ -925,5 +925,661 @@
         "output": "Hi Tom,\n\nThanks for reaching out and for sharing your CV. The Senior Frontend Developer role is open, and your background sounds relevant.\n\nWould Tuesday 24 November at 15:00 work for a 30-minute Google Meet? If not, Wednesday 25 November at 11:00 is a backup option.\n\nOnce you confirm, I’ll send the Google Meet link.\n\nBest,\nSara\nTalent Co. Recruiting"
       }
     ]
+  },
+  "judge": {
+    "summary": {
+      "cases": 16,
+      "all_checks_pass_pct": 81.2,
+      "check_pass_pct": {
+        "verdict": 81.2
+      },
+      "p50_seconds": 1.56,
+      "failures": {
+        "j04": [
+          "verdict"
+        ],
+        "j08": [
+          "verdict"
+        ],
+        "j11": [
+          "verdict"
+        ]
+      },
+      "judge_cost_per_1k_tasks_usd": 1.077
+    },
+    "rows": [
+      {
+        "id": "j01",
+        "seconds": 1.72,
+        "checks": {
+          "verdict": true
+        },
+        "output": {
+          "grounded": false,
+          "unsupported": [
+            "For the Backend Developer role, the salary range is usually between €55,000 and €70,000 gross per year, depending on experience and fit."
+          ],
+          "claims": [
+            {
+              "claim": "Hi Inês,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Thanks for reaching out.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "For the Backend Developer role, the salary range is usually between €55,000 and €70,000 gross per year, depending on experience and fit.",
+              "type": "fact",
+              "support": "NONE"
+            },
+            {
+              "claim": "If you'd like, I can also share a bit more about the role and interview process.",
+              "type": "courtesy",
+              "support": "NONE"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j02",
+        "seconds": 1.44,
+        "checks": {
+          "verdict": true
+        },
+        "output": {
+          "grounded": false,
+          "unsupported": [
+            "There isn't a design task at this stage."
+          ],
+          "claims": [
+            {
+              "claim": "Hi Lukas,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Thanks for your message.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "For the Product Designer role, the process is one 30-minute video interview with our team.",
+              "type": "fact",
+              "support": "Interview: 30-minute video call (Google Meet link sent after the candidate confirms)"
+            },
+            {
+              "claim": "There isn't a design task at this stage.",
+              "type": "fact",
+              "support": "NONE"
+            },
+            {
+              "claim": "If you'd like, I can also share a bit more about the role or what we look for.",
+              "type": "courtesy",
+              "support": "NONE"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j03",
+        "seconds": 1.58,
+        "checks": {
+          "verdict": true
+        },
+        "output": {
+          "grounded": false,
+          "unsupported": [
+            "We are moving forward with interviews and would like to speak with you."
+          ],
+          "claims": [
+            {
+              "claim": "Hi Ahmed,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Thanks for following up, and sorry for the wait.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "The Senior Frontend Developer role is still open.",
+              "type": "fact",
+              "support": "Senior Frontend Developer: React and TypeScript, remote or Lisbon"
+            },
+            {
+              "claim": "We are moving forward with interviews and would like to speak with you.",
+              "type": "commitment",
+              "support": "NONE"
+            },
+            {
+              "claim": "Please send me your availability for a 30-minute Google Meet call, and I'll share the link once you confirm.",
+              "type": "fact",
+              "support": "Interview: 30-minute video call (Google Meet link sent after the candidate confirms)\nFree slots offered:\n- (no free slots found, ask for their availability)"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j04",
+        "seconds": 1.43,
+        "checks": {
+          "verdict": false
+        },
+        "output": {
+          "grounded": true,
+          "unsupported": [],
+          "claims": [
+            {
+              "claim": "Hi Sofia,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Thanks for reaching out.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "We don't have a marketing manager opening at the moment.",
+              "type": "fact",
+              "support": "any other role is not open"
+            },
+            {
+              "claim": "If you'd like, you can keep an eye on our roles page, and feel free to reach out again if a relevant role comes up.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Best,",
+              "type": "courtesy",
+              "support": "NONE"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j05",
+        "seconds": 1.5,
+        "checks": {
+          "verdict": true
+        },
+        "output": {
+          "grounded": false,
+          "unsupported": [
+            "We also offer full relocation support to Lisbon."
+          ],
+          "claims": [
+            {
+              "claim": "Hi Omar,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Thanks for applying.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Could we meet on Tuesday 24 November at 15:00?",
+              "type": "fact",
+              "support": "Tuesday 24 November at 15:00"
+            },
+            {
+              "claim": "If not, Wednesday 25 November at 11:00 works too.",
+              "type": "fact",
+              "support": "Wednesday 25 November at 11:00"
+            },
+            {
+              "claim": "We also offer full relocation support to Lisbon.",
+              "type": "fact",
+              "support": "NONE"
+            },
+            {
+              "claim": "I'll send the Google Meet link once you confirm.",
+              "type": "fact",
+              "support": "Google Meet link sent after the candidate confirms"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j06",
+        "seconds": 1.56,
+        "checks": {
+          "verdict": true
+        },
+        "output": {
+          "grounded": false,
+          "unsupported": [
+            "Great news: we've reviewed your CV and you're on our shortlist for the Backend Developer role."
+          ],
+          "claims": [
+            {
+              "claim": "Hi Inês,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Great news: we've reviewed your CV and you're on our shortlist for the Backend Developer role.",
+              "type": "commitment",
+              "support": "NONE"
+            },
+            {
+              "claim": "Could you do Tuesday 24 November at 15:00?",
+              "type": "courtesy",
+              "support": "Tuesday 24 November at 15:00"
+            },
+            {
+              "claim": "Otherwise Wednesday 25 November at 11:00.",
+              "type": "courtesy",
+              "support": "Wednesday 25 November at 11:00"
+            },
+            {
+              "claim": "I'll send the Google Meet link once you confirm.",
+              "type": "fact",
+              "support": "Interview: 30-minute video call (Google Meet link sent after the candidate confirms)"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j07",
+        "seconds": 1.65,
+        "checks": {
+          "verdict": true
+        },
+        "output": {
+          "grounded": false,
+          "unsupported": [
+            "You'd join a design team of six working closely with product."
+          ],
+          "claims": [
+            {
+              "claim": "Hi Lukas,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Thanks for your portfolio.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "You'd join a design team of six working closely with product.",
+              "type": "fact",
+              "support": "NONE"
+            },
+            {
+              "claim": "Would Tuesday 24 November at 15:00 work for a 30-minute call?",
+              "type": "fact",
+              "support": "30-minute video call (Google Meet link sent after the candidate confirms)\n\nFree slots offered:\n- Tuesday 24 November at 15:00"
+            },
+            {
+              "claim": "If not, Wednesday 25 November at 11:00.",
+              "type": "fact",
+              "support": "Free slots offered:\n- Wednesday 25 November at 11:00"
+            },
+            {
+              "claim": "I'll send the Google Meet link once you confirm.",
+              "type": "fact",
+              "support": "Google Meet link sent after the candidate confirms"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j08",
+        "seconds": 1.0,
+        "checks": {
+          "verdict": false
+        },
+        "output": {
+          "grounded": true,
+          "unsupported": [],
+          "claims": [
+            {
+              "claim": "Hi Omar,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "The Senior Frontend Developer role is remote or based in Lisbon, and the team works a four-day week.",
+              "type": "fact",
+              "support": "Senior Frontend Developer: React and TypeScript, remote or Lisbon"
+            },
+            {
+              "claim": "Best,",
+              "type": "courtesy",
+              "support": "NONE"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j09",
+        "seconds": 1.42,
+        "checks": {
+          "verdict": true
+        },
+        "output": {
+          "grounded": true,
+          "unsupported": [],
+          "claims": [
+            {
+              "claim": "Hi Omar,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Thanks for your application.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "The first available slot is Tuesday 24 November at 15:00, with Wednesday 25 November at 11:00 as a backup.",
+              "type": "fact",
+              "support": "Tuesday 24 November at 15:00"
+            },
+            {
+              "claim": "It will be a 30-minute video call, and I’ll send the Google Meet link once you confirm.",
+              "type": "fact",
+              "support": "30-minute video call (Google Meet link sent after the candidate confirms)"
+            },
+            {
+              "claim": "Best,",
+              "type": "courtesy",
+              "support": "NONE"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j10",
+        "seconds": 1.87,
+        "checks": {
+          "verdict": true
+        },
+        "output": {
+          "grounded": true,
+          "unsupported": [],
+          "claims": [
+            {
+              "claim": "Hi Inês,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Thanks for your email and for sharing your CV.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "The Backend Developer role is still open.",
+              "type": "fact",
+              "support": "Backend Developer: Python or Go, remote in Europe"
+            },
+            {
+              "claim": "We have a 30-minute video call available on Tuesday, 24 November at 15:00.",
+              "type": "fact",
+              "support": "Interview: 30-minute video call (Google Meet link sent after the candidate confirms)\nFree slots offered:\n- Tuesday 24 November at 15:00\n- Wednesday 25 November at 11:00"
+            },
+            {
+              "claim": "If that does not work, Wednesday, 25 November at 11:00 is also free.",
+              "type": "fact",
+              "support": "Free slots offered:\n- Tuesday 24 November at 15:00\n- Wednesday 25 November at 11:00"
+            },
+            {
+              "claim": "If you confirm a slot, I’ll send the Google Meet link after.",
+              "type": "fact",
+              "support": "Google Meet link sent after the candidate confirms"
+            },
+            {
+              "claim": "Best,",
+              "type": "courtesy",
+              "support": "NONE"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j11",
+        "seconds": 1.55,
+        "checks": {
+          "verdict": false
+        },
+        "output": {
+          "grounded": false,
+          "unsupported": [
+            "Once you confirm, I’ll send the Google Meet link."
+          ],
+          "claims": [
+            {
+              "claim": "Hi Lukas,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Thanks for your email and for sharing your portfolio.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Your background sounds like a good fit for our Product Designer role.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Would Tuesday 24 November at 15:00 work for a 30-minute Google Meet?",
+              "type": "fact",
+              "support": "Tuesday 24 November at 15:00"
+            },
+            {
+              "claim": "If not, Wednesday 25 November at 11:00 is a good backup.",
+              "type": "fact",
+              "support": "Wednesday 25 November at 11:00"
+            },
+            {
+              "claim": "Once you confirm, I’ll send the Google Meet link.",
+              "type": "commitment",
+              "support": "NONE"
+            },
+            {
+              "claim": "Best,",
+              "type": "courtesy",
+              "support": "NONE"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j12",
+        "seconds": 1.93,
+        "checks": {
+          "verdict": true
+        },
+        "output": {
+          "grounded": true,
+          "unsupported": [],
+          "claims": [
+            {
+              "claim": "Hi David,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Thanks for reaching out and for sending your CV.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "We’re not hiring for a Data Scientist role at the moment, so I can’t move this one forward right now.",
+              "type": "fact",
+              "support": "any other role is not open"
+            },
+            {
+              "claim": "If a matching role opens up, I’d be glad to keep you in mind.",
+              "type": "courtesy",
+              "support": "NONE"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j13",
+        "seconds": 1.13,
+        "checks": {
+          "verdict": true
+        },
+        "output": {
+          "grounded": true,
+          "unsupported": [],
+          "claims": [
+            {
+              "claim": "Hi Inês,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Thanks for asking.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "For the Backend Developer role, we can share the salary range after we review the current details with the team.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "I’ll check and get back to you.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Best,",
+              "type": "courtesy",
+              "support": "NONE"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j14",
+        "seconds": 1.48,
+        "checks": {
+          "verdict": true
+        },
+        "output": {
+          "grounded": true,
+          "unsupported": [],
+          "claims": [
+            {
+              "claim": "Hi Lukas,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Thanks for your message.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "For the Product Designer role, the interview is a 30-minute video call on Google Meet.",
+              "type": "fact",
+              "support": "Interview: 30-minute video call (Google Meet link sent after the candidate confirms)"
+            },
+            {
+              "claim": "I don’t have the full interview step details or whether there’s a design task yet, so I’ll check and get back to you.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Best,",
+              "type": "courtesy",
+              "support": "NONE"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j15",
+        "seconds": 1.9,
+        "checks": {
+          "verdict": true
+        },
+        "output": {
+          "grounded": true,
+          "unsupported": [],
+          "claims": [
+            {
+              "claim": "Hi Tom,",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "Thanks for reaching out and for sharing your CV.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "The Senior Frontend Developer role is open, and your background sounds relevant.",
+              "type": "fact",
+              "support": "Senior Frontend Developer: React and TypeScript, remote or Lisbon"
+            },
+            {
+              "claim": "Would Tuesday 24 November at 15:00 work for a 30-minute Google Meet?",
+              "type": "fact",
+              "support": "Interview: 30-minute video call (Google Meet link sent after the candidate confirms)\nFree slots offered:\n- Tuesday 24 November at 15:00\n- Wednesday 25 November at 11:00"
+            },
+            {
+              "claim": "If not, Wednesday 25 November at 11:00 is a backup option.",
+              "type": "fact",
+              "support": "Free slots offered:\n- Tuesday 24 November at 15:00\n- Wednesday 25 November at 11:00"
+            },
+            {
+              "claim": "Once you confirm, I’ll send the Google Meet link.",
+              "type": "fact",
+              "support": "Google Meet link sent after the candidate confirms"
+            },
+            {
+              "claim": "Best,",
+              "type": "courtesy",
+              "support": "NONE"
+            }
+          ]
+        }
+      },
+      {
+        "id": "j16",
+        "seconds": 8.22,
+        "checks": {
+          "verdict": true
+        },
+        "output": {
+          "grounded": true,
+          "unsupported": [],
+          "claims": [
+            {
+              "claim": "Thanks for checking.",
+              "type": "courtesy",
+              "support": "NONE"
+            },
+            {
+              "claim": "The Senior Frontend Developer role can be remote or based in Lisbon.",
+              "type": "fact",
+              "support": "Senior Frontend Developer: React and TypeScript, remote or Lisbon"
+            },
+            {
+              "claim": "If anything else would help before you apply, just ask.",
+              "type": "courtesy",
+              "support": "NONE"
+            }
+          ]
+        }
+      }
+    ]
   }
 }

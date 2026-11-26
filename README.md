@@ -145,14 +145,29 @@ just listed "unsupported claims" caught all 8 invented facts but also flagged 7 
 drafts, including the offered slots.) Because a judge can be wrong too, it is only
 trusted as far as the `judge` suite shows (`--no-judge` scores drafts by rules alone).
 
-**The judge is advisory for now.** Over three iterations it went from flagging 7 of 8 honest
-drafts to catching **all 8 invented facts** while still over-flagging some polite sentences
-(69% on its labelled set). Gating CI on a check that is wrong a third of the time would teach
-everyone to ignore it, so its verdict on every draft is reported (`judge_grounded_pct` and the
-flagged claims) but not enforced until it clears the `judge` threshold; then set
-`judge_gates_drafts` to true. It has already paid for itself: it caught drafts promising to
-*"keep your CV on file for future roles"*, a data-protection commitment the business never made,
-which no rule could see. The drafting prompt now forbids it. Known blind spot: deferrals are
+**The judge is advisory, and here is why.** Four versions, scored on its 16 labelled drafts:
+
+| Version | Invented facts caught | Honest drafts passed | Overall |
+|---|---|---|---|
+| v1 "list unsupported claims" | 8/8 | 1/8 | 56% |
+| v4 typed claims + verified quotes (current) | 6/8 | 7/8 | 81% |
+
+Its three remaining mistakes are design limits rather than prompt wording, so further tuning on
+16 cases would mostly be fitting the test:
+- **The courtesy label is a loophole.** A planted *"keep an eye on our roles page"* was labelled
+  courtesy, and courtesy isn't checked.
+- **Half-backed sentences pass.** *"Remote or Lisbon, and the team works a four-day week"* quoted
+  real support for the first half and got through. The check confirms that the quote exists, not
+  that it covers the whole sentence.
+- **Its labels aren't consistent.** *"I'll send the Google Meet link once you confirm"* is a fact
+  backed by the process in one draft and an unsupported commitment in another.
+
+Gating CI on that would block honest drafts and still let some inventions through, so the
+verdict is reported on every draft (`judge_grounded_pct` and the flagged claims) but not
+enforced. Set `judge_gates_drafts` to true only once it clears the `judge` threshold on a larger,
+fresh labelled set. Even advisory, it has paid for itself: it caught drafts promising to *"keep
+your CV on file for future roles"*, a data-protection commitment the business never made, which
+no rule could see. The drafting prompt now forbids it. Another known blind spot: deferrals are
 filtered in code, so an invented claim containing a word like "check" would slip through. The scorers have their own tests (`tests/test_evals.py`), including a check that a
 model answering with the labels scores 100%.
 
@@ -168,6 +183,7 @@ python -m evals.run --suite draft      # one suite
 | triage | 100% (30/30) | 0.95 s | $0.39 |
 | confirm | 100% (20/20) | 0.99 s | $0.26 |
 | draft | 100% (12/12) | 1.16 s | $0.60 |
+| judge (advisory) | 81% (13/16) | 1.56 s | $1.08 |
 
 **What the first run caught.** Every unit test passed, because they use a fake model. The first
 eval run against the real one found three things they couldn't: a draft told a candidate a
