@@ -164,7 +164,7 @@ Its three remaining mistakes are design limits rather than prompt wording, so fu
 
 Gating CI on that would block honest drafts and still let some inventions through, so the
 verdict is reported on every draft (`judge_grounded_pct` and the flagged claims) but not
-enforced. Set `judge_gates_drafts` to true only once it clears the `judge` threshold on a larger,
+enforced. Set `judge_gates_drafts` to true only once it scores 90% or more on a larger,
 fresh labelled set. Even advisory, it has paid for itself: it caught drafts promising to *"keep
 your CV on file for future roles"*, a data-protection commitment the business never made, which
 no rule could see. The drafting prompt now forbids it. Another known blind spot: deferrals are
